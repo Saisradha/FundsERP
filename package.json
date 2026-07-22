@@ -1,24 +1,15 @@
 {
-  "name": "erpflow",
+  "name": "erpflow-monorepo",
   "version": "1.0.0",
-  "description": "ERPFlow - Digital Warehouse Operating System",
-  "private": true,
+  "description": "ERPFlow - Enterprise Resource Planning & 3D Telemetry Platform",
+  "main": "backend/src/index.ts",
   "scripts": {
-    "dev:backend": "npm run dev --prefix backend",
-    "dev:frontend": "npm run dev --prefix frontend",
-    "build:backend": "npm run build --prefix backend",
-    "build:frontend": "npm run build --prefix frontend",
-    "seed": "npm run seed --prefix backend"
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npx prisma generate && npx tsc",
+    "build:frontend": "cd frontend && npm run build",
+    "vercel-build": "npm run build"
   },
-  "keywords": [
-    "erp",
-    "crm",
-    "warehouse",
-    "threejs",
-    "react",
-    "express",
-    "prisma"
-  ],
-  "author": "ERPFlow Engineering",
+  "keywords": ["erp", "warehouse", "threejs", "react", "express", "prisma"],
+  "author": "SaiSradha",
   "license": "MIT"
 }
