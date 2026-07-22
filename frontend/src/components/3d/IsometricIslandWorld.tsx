@@ -45,7 +45,7 @@ const BuildingBase = ({
   position,
   label,
   sublabel,
-  color = '#2563EB',
+  color = '#3B82F6',
   onClick,
   children,
 }: {
@@ -77,17 +77,17 @@ const BuildingBase = ({
       onPointerOut={() => setHovered(false)}
       onClick={(e) => { e.stopPropagation(); onClick(); }}
     >
-      {/* Floating Info Tooltip Label */}
+      {/* Floating Info Tooltip Label (High Contrast Crisp White Text) */}
       <Float speed={2} floatIntensity={0.2}>
-        <group position={[0, 6, 0]}>
+        <group position={[0, 6.2, 0]}>
           <mesh position={[0, 0, 0]}>
-            <planeGeometry args={[4.2, 1.2]} />
-            <meshBasicMaterial color="#FFFFFF" transparent opacity={hovered ? 0.95 : 0.8} />
+            <planeGeometry args={[4.5, 1.3]} />
+            <meshBasicMaterial color="#0F172A" transparent opacity={hovered ? 0.95 : 0.85} />
           </mesh>
-          <Text position={[0, 0.2, 0.01]} fontSize={0.32} color="#0F172A" anchorX="center">
+          <Text position={[0, 0.22, 0.01]} fontSize={0.35} color="#FFFFFF" anchorX="center" font="https://fonts.gstatic.com/s/outfit/v11/Q1dbZXr2zd120VT8653F.woff">
             {label}
           </Text>
-          <Text position={[0, -0.25, 0.01]} fontSize={0.22} color={color} anchorX="center">
+          <Text position={[0, -0.25, 0.01]} fontSize={0.25} color={color} anchorX="center" font="https://fonts.gstatic.com/s/outfit/v11/Q1dbZXr2zd120VT8653F.woff">
             {sublabel}
           </Text>
         </group>
@@ -106,35 +106,35 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
   activeCustomerCount,
 }) => {
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#F4F7FA] z-0">
+    <div className="fixed inset-0 w-full h-full bg-[#0A0F1D] z-0">
       <Canvas camera={{ position: [26, 26, 26], fov: 40 }} shadows>
-        <color attach="background" args={['#F4F7FA']} />
+        <color attach="background" args={['#0A0F1D']} />
+        <fog attach="fog" args={['#0A0F1D', 15, 80]} />
         
-        {/* Soft Ambient & Directional Warm Sunlight */}
-        <ambientLight intensity={0.8} />
+        {/* Soft Ambient & Volumetric Blue Directional Lighting */}
+        <ambientLight intensity={0.6} />
         <directionalLight
-          position={[30, 40, 20]}
-          intensity={1.5}
+          position={[25, 35, 20]}
+          intensity={1.8}
+          color="#3B82F6"
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
-        <pointLight position={[-10, 15, 10]} intensity={0.6} color="#3B82F6" />
+        <pointLight position={[-10, 15, 10]} intensity={1.2} color="#60A5FA" />
+        <pointLight position={[10, 15, -10]} intensity={1.2} color="#10B981" />
 
         {/* Isometric Camera Lerp Controller */}
         <IsometricCameraRig activeModule={activeModule} />
 
-        {/* Floating Miniature Industrial Island Base */}
+        {/* Floating Industrial Steel Base Platform */}
         <group position={[0, -1, 0]}>
           <RoundedBox args={[34, 1.2, 34]} radius={0.8} smoothness={4} receiveShadow>
-            <meshStandardMaterial color="#E2E8F0" roughness={0.4} />
+            <meshStandardMaterial color="#1E293B" roughness={0.3} metalness={0.5} />
           </RoundedBox>
 
-          {/* Island Grass/Concrete Top Pad */}
-          <mesh position={[0, 0.61, 0]} receiveShadow>
-            <boxGeometry args={[32.5, 0.05, 32.5]} />
-            <meshStandardMaterial color="#CBD5E1" roughness={0.3} />
-          </mesh>
+          {/* Glowing Platform Edge Grid */}
+          <gridHelper args={[32, 32, '#3B82F6', '#1E293B']} position={[0, 0.61, 0]} />
         </group>
 
         {/* 1. 📦 Inventory Warehouse Building Racks */}
@@ -142,25 +142,25 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
           position={[-10, 0, 8]}
           label="WAREHOUSE RACKS"
           sublabel={`${productStats.healthy + productStats.low + productStats.critical} SKUs Logged`}
-          color="#2563EB"
+          color="#60A5FA"
           onClick={() => onSelectModule('inventory')}
         >
           <RoundedBox args={[6, 3.5, 6]} radius={0.3} smoothness={4} castShadow receiveShadow>
-            <meshStandardMaterial color="#FFFFFF" roughness={0.2} metalness={0.1} />
+            <meshStandardMaterial color="#1E293B" roughness={0.2} metalness={0.6} />
           </RoundedBox>
 
           {/* Color-Coded Stock Health Windows */}
           <mesh position={[-1.8, 1.5, 3.01]}>
             <planeGeometry args={[1.2, 1.2]} />
-            <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={0.5} />
+            <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={0.8} />
           </mesh>
           <mesh position={[0, 1.5, 3.01]}>
             <planeGeometry args={[1.2, 1.2]} />
-            <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={0.5} />
+            <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={0.8} />
           </mesh>
           <mesh position={[1.8, 1.5, 3.01]}>
             <planeGeometry args={[1.2, 1.2]} />
-            <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.5} />
+            <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.8} />
           </mesh>
         </BuildingBase>
 
@@ -169,15 +169,15 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
           position={[-10, 0, -5]}
           label="CRM OFFICE TOWER"
           sublabel={`${activeCustomerCount} Active Accounts`}
-          color="#3B82F6"
+          color="#38BDF8"
           onClick={() => onSelectModule('crm')}
         >
           <RoundedBox args={[5.5, 5, 5.5]} radius={0.4} smoothness={4} castShadow receiveShadow>
-            <meshStandardMaterial color="#FFFFFF" roughness={0.1} metalness={0.2} />
+            <meshStandardMaterial color="#0F172A" roughness={0.1} metalness={0.8} />
           </RoundedBox>
           <mesh position={[0, 2.5, 2.76]}>
             <planeGeometry args={[4, 3.8]} />
-            <meshStandardMaterial color="#3B82F6" transparent opacity={0.4} roughness={0.1} />
+            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={0.4} transparent opacity={0.6} roughness={0.1} />
           </mesh>
         </BuildingBase>
 
@@ -186,17 +186,17 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
           position={[10, 0, 8]}
           label="DISPATCH DOCK"
           sublabel="Loading Bay 01"
-          color="#F59E0B"
+          color="#FBBF24"
           onClick={() => onSelectModule('challans')}
         >
           <RoundedBox args={[7, 2.5, 5.5]} radius={0.3} smoothness={4} castShadow receiveShadow>
-            <meshStandardMaterial color="#F8FAFC" roughness={0.3} />
+            <meshStandardMaterial color="#1E293B" roughness={0.3} metalness={0.6} />
           </RoundedBox>
           {/* Parked Truck */}
           <group position={[0, 1, 3.5]}>
             <mesh position={[0, 0.8, 0]}>
               <boxGeometry args={[3.5, 1.8, 2.5]} />
-              <meshStandardMaterial color="#2563EB" />
+              <meshStandardMaterial color="#3B82F6" emissive="#3B82F6" emissiveIntensity={0.3} />
             </mesh>
           </group>
         </BuildingBase>
@@ -206,15 +206,15 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
           position={[10, 0, -5]}
           label="ANALYTICS SPIRE"
           sublabel="Live Telemetry"
-          color="#10B981"
+          color="#34D399"
           onClick={() => onSelectModule('reports')}
         >
           <RoundedBox args={[4.5, 7.5, 4.5]} radius={0.3} smoothness={4} castShadow receiveShadow>
-            <meshStandardMaterial color="#FFFFFF" roughness={0.15} />
+            <meshStandardMaterial color="#0F172A" roughness={0.15} metalness={0.7} />
           </RoundedBox>
           <mesh position={[0, 4.2, 0]}>
             <cylinderGeometry args={[0.08, 0.08, 2, 8]} />
-            <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={1} />
+            <meshStandardMaterial color="#34D399" emissive="#34D399" emissiveIntensity={1} />
           </mesh>
         </BuildingBase>
 
@@ -223,11 +223,11 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
           position={[0, 0, -10]}
           label="SALES & AUDIT CENTER"
           sublabel="Movement Logs"
-          color="#64748B"
+          color="#94A3B8"
           onClick={() => onSelectModule('logs')}
         >
           <RoundedBox args={[6, 3, 4.5]} radius={0.3} smoothness={4} castShadow receiveShadow>
-            <meshStandardMaterial color="#F1F5F9" roughness={0.3} />
+            <meshStandardMaterial color="#1E293B" roughness={0.3} metalness={0.5} />
           </RoundedBox>
         </BuildingBase>
 
