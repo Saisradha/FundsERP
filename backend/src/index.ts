@@ -26,10 +26,12 @@ app.use('/api', apiRoutes);
 // Error Handling Middleware
 app.use(errorHandler);
 
-// Start server
-app.listen(config.port, () => {
-  console.log(`🚀 ERPFlow Backend API running at http://localhost:${config.port}`);
-  console.log(`📡 Health Check: http://localhost:${config.port}/health`);
-});
+// Start server locally (bypass listening when running on Vercel serverless)
+if (!process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`🚀 ERPFlow Backend API running at http://localhost:${config.port}`);
+    console.log(`📡 Health Check: http://localhost:${config.port}/health`);
+  });
+}
 
 export default app;
