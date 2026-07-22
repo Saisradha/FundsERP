@@ -34,6 +34,7 @@ const savedTheme = (typeof window !== 'undefined'
   ? localStorage.getItem('erpflow-theme') as ThemeMode | null
   : null) || 'dark';
 
+// Default to '3d' mode so the 3D environment is immediately visible!
 const savedView = (typeof window !== 'undefined'
   ? localStorage.getItem('erpflow-view') as ViewMode | null
   : null) || '3d';

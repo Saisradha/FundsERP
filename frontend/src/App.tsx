@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
@@ -8,22 +8,23 @@ import { LoginPage } from './pages/LoginPage';
 import { IsometricNavDock } from './components/IsometricNavDock';
 import { InteractiveHub } from './components/InteractiveHub';
 import { RightGlassPanel } from './components/RightGlassPanel';
+import { CommandPalette } from './components/CommandPalette';
 import { ToastProvider } from './components/ui/Toast';
 import { apiRequest } from './services/api';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load the heavy 3D scene
+// Lazy load heavy 3D scene
 const IsometricIslandWorld = lazy(() =>
   import('./components/3d/IsometricIslandWorld').then((m) => ({ default: m.IsometricIslandWorld }))
 );
 
 const ThreeDFallback = () => (
   <div className="fixed inset-0 flex items-center justify-center z-0"
-       style={{ background: 'var(--color-bg)' }}>
+       style={{ backgroundColor: 'var(--color-bg)' }}>
     <div className="flex flex-col items-center gap-3 animate-fade-in">
       <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
-      <span className="text-xs font-mono" style={{ color: 'var(--color-text-secondary)' }}>
-        Loading 3D Environment...
+      <span className="text-xs font-mono font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
+        Loading 3D Spatial Environment...
       </span>
     </div>
   </div>
@@ -31,7 +32,7 @@ const ThreeDFallback = () => (
 
 export function App() {
   const { isAuthenticated } = useAuthStore();
-  const { resolvedTheme, viewMode, initTheme } = useThemeStore();
+  const { resolvedTheme, viewMode, initTheme, setViewMode, toggleTheme } = useThemeStore();
 
   const [activeModule, setActiveModule] = useState<
     'dashboard' | 'inventory' | 'crm' | 'challans' | 'logs' | 'reports'
@@ -43,12 +44,15 @@ export function App() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Command palette state
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
   // Initialize theme on mount
   useEffect(() => {
     initTheme();
-  }, []);
+  }, [initTheme]);
 
-  const fetchWorldData = async () => {
+  const fetchWorldData = useCallback(async () => {
     setLoading(true);
     try {
       const [pRes, cRes, chRes, lRes] = await Promise.all([
@@ -66,20 +70,48 @@ export function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchWorldData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchWorldData]);
 
   // Refresh data when switching modules
   useEffect(() => {
     if (isAuthenticated && activeModule !== 'dashboard') {
       fetchWorldData();
     }
-  }, [activeModule]);
+  }, [activeModule, isAuthenticated, fetchWorldData]);
+
+  // Global Keyboard Shortcuts (Cmd+K, Cmd+1..6, Cmd+J, Cmd+B)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      } else if (isCmdOrCtrl && e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        toggleTheme();
+      } else if (isCmdOrCtrl && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        setViewMode(viewMode === 'hub' ? '3d' : 'hub');
+      } else if (isCmdOrCtrl && ['1', '2', '3', '4', '5', '6'].includes(e.key)) {
+        e.preventDefault();
+        const mods: Array<'dashboard' | 'inventory' | 'crm' | 'challans' | 'logs' | 'reports'> = [
+          'dashboard', 'inventory', 'crm', 'challans', 'logs', 'reports'
+        ];
+        const idx = parseInt(e.key, 10) - 1;
+        if (mods[idx]) setActiveModule(mods[idx]);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [toggleTheme, setViewMode, viewMode]);
 
   const healthyCount = products.filter((p) => p.currentStock > p.minStockAlert).length;
   const lowCount = products.filter((p) => p.currentStock <= p.minStockAlert && p.currentStock > 0).length;
@@ -113,9 +145,10 @@ export function App() {
       <IsometricNavDock
         activeModule={activeModule}
         onSelectModule={(mod) => setActiveModule(mod)}
+        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
       />
 
-      {/* Hub Mode — Full overlay with all CRUD */}
+      {/* Enterprise Hub Mode — Full overlay with all CRUD */}
       <AnimatePresence mode="wait">
         {viewMode === 'hub' && (
           <motion.div
@@ -125,9 +158,10 @@ export function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 overflow-y-auto z-10 backdrop-blur-xl"
-            style={{ background: resolvedTheme === 'dark'
-              ? 'rgba(5, 7, 10, 0.92)'
-              : 'rgba(245, 247, 250, 0.92)'
+            style={{
+              backgroundColor: resolvedTheme === 'dark'
+                ? 'rgba(6, 9, 14, 0.93)'
+                : 'rgba(246, 248, 250, 0.93)'
             }}
           >
             <InteractiveHub
@@ -156,6 +190,15 @@ export function App() {
           />
         )}
       </AnimatePresence>
+
+      {/* Spotlight Command Palette (Cmd+K) */}
+      <CommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onSelectModule={(mod) => setActiveModule(mod)}
+        products={products}
+        customers={customers}
+      />
 
       {/* Toast Notifications */}
       <ToastProvider />

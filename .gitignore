@@ -30,6 +30,8 @@ Thumbs.db
 # Prisma / DB
 prisma/*.db
 prisma/*.db-journal
+backend/prisma/*.db
+backend/prisma/*.db-journal
 
 # Temporary / Scratch
 scratch/

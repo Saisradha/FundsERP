@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Float, RoundedBox, Line } from '@react-three/drei';
+import { OrbitControls, Html, Float, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
 import { Product3D } from '../../store/useWarehouseStore';
 
@@ -54,20 +54,20 @@ const SpatialCameraRig = ({ sector }: { sector: string }) => {
 };
 
 // 3D Storage Rack Unit (Color Coded Stock Health)
-const StorageRack3D = ({ 
-  position, 
-  shelfId, 
-  product, 
-  onSelect 
-}: { 
-  position: [number, number, number]; 
-  shelfId: string; 
-  product?: Product3D; 
-  onSelect: (p: Product3D) => void; 
+const StorageRack3D = ({
+  position,
+  shelfId,
+  product,
+  onSelect
+}: {
+  position: [number, number, number];
+  shelfId: string;
+  product?: Product3D;
+  onSelect: (p: Product3D) => void;
 }) => {
   const isLow = product ? product.currentStock <= product.minStockAlert && product.currentStock > 0 : false;
   const isOut = product ? product.currentStock === 0 : false;
-  const healthColor = isOut ? '#EF4444' : isLow ? '#F59E0B' : '#10B981';
+  const healthColor = isOut ? '#F43F5E' : isLow ? '#F59E0B' : '#10B981';
 
   const boxCount = product ? Math.min(Math.ceil(product.currentStock / 10), 8) : 0;
 
@@ -78,7 +78,7 @@ const StorageRack3D = ({
         [-0.9, 0.9].map((z, j) => (
           <mesh key={`${i}-${j}`} position={[x, 2.5, z]}>
             <cylinderGeometry args={[0.08, 0.08, 5, 8]} />
-            <meshStandardMaterial color="#141820" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial color="#475569" metalness={0.4} roughness={0.3} />
           </mesh>
         ))
       )}
@@ -87,21 +87,18 @@ const StorageRack3D = ({
       {[0.5, 2.3, 4.1].map((y, idx) => (
         <mesh key={idx} position={[0, y, 0]}>
           <boxGeometry args={[4, 0.1, 2]} />
-          <meshStandardMaterial color="#1B212C" metalness={0.7} />
+          <meshStandardMaterial color="#334155" metalness={0.4} />
         </mesh>
       ))}
 
       {/* Floating Telemetry Tag */}
       <Float speed={2} floatIntensity={0.2}>
-        <Text
-          position={[0, 4.9, 0]}
-          fontSize={0.35}
-          color={healthColor}
-          font="https://fonts.gstatic.com/s/outfit/v11/Q1dbZXr2zd120VT8653F.woff"
-          anchorX="center"
-        >
-          {shelfId} {product ? `(${product.currentStock} Units)` : ''}
-        </Text>
+        <Html position={[0, 4.9, 0]} center distanceFactor={25}>
+          <div className="px-2.5 py-1 rounded-xl border backdrop-blur-md text-[11px] font-mono font-bold whitespace-nowrap shadow-lg pointer-events-none select-none"
+               style={{ backgroundColor: '#0B101D', borderColor: healthColor, color: healthColor, boxShadow: `0 0 14px ${healthColor}` }}>
+            {shelfId} {product ? `(${product.currentStock} Units)` : ''}
+          </div>
+        </Html>
       </Float>
 
       {/* Product Stock Boxes */}
@@ -119,7 +116,7 @@ const StorageRack3D = ({
                   <meshStandardMaterial
                     color={healthColor}
                     emissive={healthColor}
-                    emissiveIntensity={isLow ? 0.8 : 0.25}
+                    emissiveIntensity={isLow ? 0.9 : 0.4}
                     roughness={0.3}
                   />
                 </RoundedBox>
@@ -133,7 +130,7 @@ const StorageRack3D = ({
       {isOut && (
         <mesh position={[0, 1.4, 0]}>
           <boxGeometry args={[2.5, 0.9, 1.3]} />
-          <meshStandardMaterial color="#EF4444" wireframe emissive="#EF4444" emissiveIntensity={0.8} />
+          <meshStandardMaterial color="#F43F5E" wireframe emissive="#F43F5E" emissiveIntensity={1} />
         </mesh>
       )}
     </group>
@@ -141,17 +138,17 @@ const StorageRack3D = ({
 };
 
 // 3D Customer Orbit Constellation Node
-const CustomerOrbitNode3D = ({ 
-  customer, 
-  position, 
-  onSelect 
-}: { 
-  customer: Customer3DNode; 
-  position: [number, number, number]; 
-  onSelect: (c: Customer3DNode) => void; 
+const CustomerOrbitNode3D = ({
+  customer,
+  position,
+  onSelect
+}: {
+  customer: Customer3DNode;
+  position: [number, number, number];
+  onSelect: (c: Customer3DNode) => void;
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const nodeColor = customer.status === 'ACTIVE' ? '#3B82F6' : customer.status === 'LEAD' ? '#F59E0B' : '#94A3B8';
+  const nodeColor = customer.status === 'ACTIVE' ? '#06B6D4' : customer.status === 'LEAD' ? '#F59E0B' : '#94A3B8';
 
   useFrame((state) => {
     if (meshRef.current) {
@@ -162,25 +159,22 @@ const CustomerOrbitNode3D = ({
   return (
     <group position={position}>
       <mesh ref={meshRef} onClick={(e) => { e.stopPropagation(); onSelect(customer); }}>
-        <sphereGeometry args={[0.75, 32, 32]} />
-        <meshStandardMaterial color={nodeColor} emissive={nodeColor} emissiveIntensity={0.7} roughness={0.2} />
+        <sphereGeometry args={[0.85, 32, 32]} />
+        <meshStandardMaterial color={nodeColor} emissive={nodeColor} emissiveIntensity={0.8} roughness={0.2} />
       </mesh>
 
       <mesh rotation={[Math.PI / 3, 0, 0]}>
-        <ringGeometry args={[1.1, 1.15, 32]} />
-        <meshBasicMaterial color={nodeColor} side={THREE.DoubleSide} transparent opacity={0.5} />
+        <ringGeometry args={[1.2, 1.25, 32]} />
+        <meshBasicMaterial color={nodeColor} side={THREE.DoubleSide} transparent opacity={0.6} />
       </mesh>
 
       <Float speed={2} floatIntensity={0.2}>
-        <Text
-          position={[0, 1.3, 0]}
-          fontSize={0.3}
-          color="#F8FAFC"
-          font="https://fonts.gstatic.com/s/outfit/v11/Q1dbZXr2zd120VT8653F.woff"
-          anchorX="center"
-        >
-          {customer.businessName || customer.name}
-        </Text>
+        <Html position={[0, 1.5, 0]} center distanceFactor={25}>
+          <div className="px-2 py-0.5 rounded-lg border backdrop-blur-md text-[10px] font-mono font-bold whitespace-nowrap shadow-lg pointer-events-none select-none"
+               style={{ backgroundColor: '#0B101D', borderColor: nodeColor, color: '#F8FAFC' }}>
+            {customer.businessName || customer.name}
+          </div>
+        </Html>
       </Float>
     </group>
   );
@@ -201,23 +195,26 @@ const DispatchDock3D = ({ isDispatching = false }: { isDispatching?: boolean }) 
       {/* Truck Cargo Body */}
       <mesh position={[0, 2, 0]}>
         <boxGeometry args={[4.5, 3.2, 7]} />
-        <meshStandardMaterial color="#222A38" metalness={0.6} roughness={0.3} />
+        <meshStandardMaterial color="#334155" metalness={0.4} roughness={0.3} />
       </mesh>
       {/* Driver Cabin */}
       <mesh position={[0, 1.6, -4.5]}>
         <boxGeometry args={[4.3, 2.5, 2.5]} />
-        <meshStandardMaterial color="#141820" metalness={0.8} />
+        <meshStandardMaterial color="#1E293B" metalness={0.6} />
       </mesh>
       {/* Headlights */}
       {[-1.5, 1.5].map((x, i) => (
         <mesh key={i} position={[x, 1.2, -5.8]}>
           <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-          <meshStandardMaterial color="#3B82F6" emissive="#3B82F6" emissiveIntensity={1} />
+          <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={1.5} />
         </mesh>
       ))}
-      <Text position={[0, 4.2, 0]} fontSize={0.5} color="#3B82F6" anchorX="center">
-        DISPATCH BAY 01
-      </Text>
+      <Html position={[0, 4.2, 0]} center distanceFactor={25}>
+        <div className="px-3 py-1 rounded-xl border backdrop-blur-md text-xs font-mono font-bold whitespace-nowrap shadow-lg text-[#06B6D4] border-[#06B6D4]"
+             style={{ backgroundColor: '#0B101D' }}>
+          DISPATCH BAY 01
+        </div>
+      </Html>
     </group>
   );
 };
@@ -237,12 +234,12 @@ const ConveyorBelt3D = () => {
       {/* Conveyor Belt Surface */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[14, 0.2, 1.2]} />
-        <meshStandardMaterial color="#141820" metalness={0.9} />
+        <meshStandardMaterial color="#334155" metalness={0.6} />
       </mesh>
       {/* Traveling Stock Box */}
       <mesh ref={boxRef} position={[-6, 0.5, 0]}>
         <boxGeometry args={[0.7, 0.6, 0.7]} />
-        <meshStandardMaterial color="#3B82F6" emissive="#3B82F6" emissiveIntensity={0.4} />
+        <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={0.8} />
       </mesh>
     </group>
   );
@@ -257,20 +254,22 @@ export const SpatialWarehouseWorld: React.FC<SpatialWarehouseWorldProps> = ({
   isDispatching,
 }) => {
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#05070A] z-0">
+    <div className="fixed inset-0 w-full h-full bg-[#060B14] z-0">
       <Canvas camera={{ position: [0, 16, 26], fov: 45 }}>
-        <color attach="background" args={['#05070A']} />
-        <fog attach="fog" args={['#05070A', 10, 90]} />
+        <color attach="background" args={['#060B14']} />
+        <fog attach="fog" args={['#060B14', 35, 130]} />
 
-        <ambientLight intensity={0.5} />
-        <pointLight position={[0, 20, 0]} intensity={1.8} color="#3B82F6" />
-        <directionalLight position={[15, 25, 15]} intensity={1.2} />
+        <ambientLight intensity={1.8} />
+        <pointLight position={[0, 22, 0]} intensity={3.0} color="#06B6D4" />
+        <pointLight position={[-15, 18, 15]} intensity={2.5} color="#8B5CF6" />
+        <pointLight position={[15, 18, -15]} intensity={2.5} color="#10B981" />
+        <directionalLight position={[15, 25, 15]} intensity={2.5} color="#F0F9FF" />
 
         {/* Spatial Camera Lerp Controller */}
         <SpatialCameraRig sector={selectedSector} />
 
         {/* Spatial Ground Floor Grid */}
-        <gridHelper args={[90, 90, '#3B82F6', '#1B212C']} position={[0, 0, 0]} />
+        <gridHelper args={[90, 90, '#06B6D4', '#8B5CF6']} position={[0, 0, 0]} />
 
         {/* 1. Storage Racks Zone (Left) */}
         <group position={[-14, 0, 0]}>
