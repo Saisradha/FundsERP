@@ -84,10 +84,10 @@ const BuildingBase = ({
             <planeGeometry args={[4.5, 1.3]} />
             <meshBasicMaterial color="#0F172A" transparent opacity={hovered ? 0.95 : 0.85} />
           </mesh>
-          <Text position={[0, 0.22, 0.01]} fontSize={0.35} color="#FFFFFF" anchorX="center" font="https://fonts.gstatic.com/s/outfit/v11/Q1dbZXr2zd120VT8653F.woff">
+          <Text position={[0, 0.22, 0.01]} fontSize={0.35} color="#FFFFFF" anchorX="center">
             {label}
           </Text>
-          <Text position={[0, -0.25, 0.01]} fontSize={0.25} color={color} anchorX="center" font="https://fonts.gstatic.com/s/outfit/v11/Q1dbZXr2zd120VT8653F.woff">
+          <Text position={[0, -0.25, 0.01]} fontSize={0.25} color={color} anchorX="center">
             {sublabel}
           </Text>
         </group>
@@ -112,17 +112,17 @@ export const IsometricIslandWorld: React.FC<IsometricIslandWorldProps> = ({
         <fog attach="fog" args={['#0A0F1D', 15, 80]} />
         
         {/* Soft Ambient & Volumetric Blue Directional Lighting */}
-        <ambientLight intensity={0.6} />
+        <ambientLight intensity={0.8} />
         <directionalLight
           position={[25, 35, 20]}
-          intensity={1.8}
-          color="#3B82F6"
+          intensity={2.0}
+          color="#60A5FA"
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
-        <pointLight position={[-10, 15, 10]} intensity={1.2} color="#60A5FA" />
-        <pointLight position={[10, 15, -10]} intensity={1.2} color="#10B981" />
+        <pointLight position={[-10, 15, 10]} intensity={1.5} color="#60A5FA" />
+        <pointLight position={[10, 15, -10]} intensity={1.5} color="#10B981" />
 
         {/* Isometric Camera Lerp Controller */}
         <IsometricCameraRig activeModule={activeModule} />
