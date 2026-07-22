@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from './store/useAuthStore';
+import { useThemeStore } from './store/useThemeStore';
 import { Product3D } from './store/useWarehouseStore';
 
 import { LoginPage } from './pages/LoginPage';
 import { IsometricIslandWorld } from './components/3d/IsometricIslandWorld';
 import { IsometricNavDock } from './components/IsometricNavDock';
 import { RightGlassPanel } from './components/RightGlassPanel';
+import { InteractiveHub } from './components/InteractiveHub';
 import { apiRequest } from './services/api';
 
 export function App() {
   const { isAuthenticated } = useAuthStore();
+  const { theme, viewMode } = useThemeStore();
+
   const [activeModule, setActiveModule] = useState<'dashboard' | 'inventory' | 'crm' | 'challans' | 'logs' | 'reports'>('dashboard');
 
   const [products, setProducts] = useState<Product3D[]>([]);
@@ -30,7 +34,7 @@ export function App() {
       setChallans(chRes.data || []);
       setLogs(lRes.data || []);
     } catch (err) {
-      console.error('Failed to load 3D city telemetry data', err);
+      console.error('Failed to load telemetry data', err);
     }
   };
 
@@ -43,7 +47,6 @@ export function App() {
   const healthyCount = products.filter((p) => p.currentStock > p.minStockAlert).length;
   const lowCount = products.filter((p) => p.currentStock <= p.minStockAlert && p.currentStock > 0).length;
   const criticalCount = products.filter((p) => p.currentStock === 0).length;
-
   const activeCustomerCount = customers.filter((c) => c.status === 'ACTIVE').length;
 
   if (!isAuthenticated) {
@@ -51,9 +54,9 @@ export function App() {
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#F4F7FA] font-sans">
+    <div className={`relative w-screen h-screen overflow-hidden ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
       
-      {/* Master 3D Isometric Miniature Industrial City World */}
+      {/* Persistent Ambient 3D Isometric Miniature Industrial City World */}
       <IsometricIslandWorld
         activeModule={activeModule}
         onSelectModule={(mod) => setActiveModule(mod)}
@@ -61,22 +64,37 @@ export function App() {
         activeCustomerCount={activeCustomerCount}
       />
 
-      {/* Floating Light Glass Building Navigation Dock */}
+      {/* Floating Top Dock: Navigation, Theme Toggle, View Switcher */}
       <IsometricNavDock
         activeModule={activeModule}
         onSelectModule={(mod) => setActiveModule(mod)}
       />
 
-      {/* Right-Side Slide-Over White Glass Spatial Panel */}
-      <RightGlassPanel
-        module={activeModule}
-        onClose={() => setActiveModule('dashboard')}
-        products={products}
-        customers={customers}
-        challans={challans}
-        logs={logs}
-        onRefresh={fetchWorldData}
-      />
+      {/* Mode A: Interactive Control Hub View Overlay */}
+      {viewMode === 'hub' && (
+        <div className="absolute inset-0 overflow-y-auto z-10 bg-slate-950/20 backdrop-blur-sm">
+          <InteractiveHub
+            products={products}
+            customers={customers}
+            challans={challans}
+            logs={logs}
+            onRefresh={fetchWorldData}
+          />
+        </div>
+      )}
+
+      {/* Mode B: 3D Spatial Building Zoom View + Right Glass Panel */}
+      {viewMode === '3d' && (
+        <RightGlassPanel
+          module={activeModule}
+          onClose={() => setActiveModule('dashboard')}
+          products={products}
+          customers={customers}
+          challans={challans}
+          logs={logs}
+          onRefresh={fetchWorldData}
+        />
+      )}
 
     </div>
   );
