@@ -102,7 +102,7 @@ export const SalesChallanPage: React.FC = () => {
       fetchData();
     } catch (err: any) {
       setErrorMessage(err.message || 'Challan creation failed');
-    } font-mono finally {
+    } finally {
       setLoading(false);
     }
   };
