@@ -5,9 +5,7 @@ import {
   Users, 
   AlertTriangle, 
   TrendingUp, 
-  Truck, 
-  ArrowRight,
-  Boxes
+  ArrowRight
 } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { useWarehouseStore } from '../store/useWarehouseStore';
@@ -58,7 +56,7 @@ export const DashboardPage: React.FC = () => {
 
         setRecentLogs(logs);
       } catch (err) {
-        console.error('Failed to load dashboard data', err);
+        console.error('Failed to load dashboard telemetry data', err);
       }
     }
 
@@ -68,78 +66,78 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 font-sans">
       
-      {/* Header */}
+      {/* Apple Display Header */}
       <div>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight">OPERATIONS DASHBOARD</h1>
-        <p className="text-xs text-slate-400 font-mono mt-1">Overview of inventory telemetry, CRM pipeline, and sales challan dispatches.</p>
+        <h1 className="text-3xl font-extrabold text-white tracking-tight">Operations Overview</h1>
+        <p className="text-xs text-slate-400 font-sans mt-1">Real-time inventory metrics, CRM accounts, and sales dispatches.</p>
       </div>
 
-      {/* KPI Cards */}
+      {/* Apple-style Soft Rounded KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+        <div className="apple-card p-6 space-y-3">
           <div className="flex justify-between items-center text-slate-400 text-xs font-mono">
-            <span>TOTAL DISPATCH REVENUE</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <span>DISPATCH REVENUE</span>
+            <div className="p-2 rounded-2xl bg-emerald-500/10 text-emerald-400">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-white font-mono">
+          <div className="text-2xl font-bold text-white font-mono">
             ${stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+          <div className="text-[11px] text-emerald-400 font-sans flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" />
             <span>{stats.confirmedChallans} Confirmed Orders</span>
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+        <div className="apple-card p-6 space-y-3">
           <div className="flex justify-between items-center text-slate-400 text-xs font-mono">
             <span>WAREHOUSE SKUS</span>
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+            <div className="p-2 rounded-2xl bg-blue-500/10 text-blue-400">
               <Package className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-white font-mono">{stats.totalProducts} ITEMS</div>
-          <div className="text-[11px] text-blue-400 font-mono">Mapped across warehouse racks</div>
+          <div className="text-2xl font-bold text-white font-mono">{stats.totalProducts} ITEMS</div>
+          <div className="text-[11px] text-slate-400 font-sans">Mapped in catalog</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+        <div className="apple-card p-6 space-y-3">
           <div className="flex justify-between items-center text-slate-400 text-xs font-mono">
             <span>ACTIVE CRM CLIENTS</span>
-            <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
+            <div className="p-2 rounded-2xl bg-sky-500/10 text-sky-400">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-white font-mono">{stats.activeCustomers} / {stats.totalCustomers}</div>
-          <div className="text-[11px] text-cyan-400 font-mono">Enterprise customer accounts</div>
+          <div className="text-2xl font-bold text-white font-mono">{stats.activeCustomers} / {stats.totalCustomers}</div>
+          <div className="text-[11px] text-sky-400 font-sans">Active accounts</div>
         </div>
 
-        <div className="bg-slate-900 border border-amber-500/30 bg-amber-950/10 p-5 rounded-2xl space-y-3">
+        <div className="apple-card p-6 space-y-3 border-amber-500/30">
           <div className="flex justify-between items-center text-amber-300 text-xs font-mono">
             <span>LOW STOCK ALERTS</span>
-            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+            <div className="p-2 rounded-2xl bg-amber-500/20 text-amber-400">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-amber-400 font-mono">{stats.lowStockCount} WARNINGS</div>
-          <div className="text-[11px] text-amber-300 font-mono">Stock at or below minimum threshold</div>
+          <div className="text-2xl font-bold text-amber-400 font-mono">{stats.lowStockCount} WARNINGS</div>
+          <div className="text-[11px] text-amber-300 font-sans">Requires replenishment</div>
         </div>
 
       </div>
 
-      {/* Main Grid: Recent Activity Feed & Module Shortcuts */}
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Recent Activity Log */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+        {/* Recent Stock Movements Feed */}
+        <div className="lg:col-span-2 apple-card p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-white tracking-tight">RECENT STOCK MOVEMENTS</h2>
+            <h2 className="text-base font-bold text-white tracking-tight">Recent Movements</h2>
             <button
               onClick={() => setActiveTab('logs')}
-              className="text-xs font-mono text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-xs font-sans text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>View All Logs</span>
+              <span>View Audit Logs</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -149,12 +147,12 @@ export const DashboardPage: React.FC = () => {
               <div className="p-6 text-center text-slate-500 font-mono text-xs">No recent movement records.</div>
             ) : (
               recentLogs.map((log) => (
-                <div key={log.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-between text-xs">
+                <div key={log.id} className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/5 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
                       log.type === 'IN' 
-                        ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400' 
-                        : 'bg-amber-500/20 border border-amber-500/30 text-amber-400'
+                        ? 'apple-pill-green' 
+                        : 'apple-pill-amber'
                     }`}>
                       {log.type}
                     </span>
@@ -175,40 +173,40 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Operations Controls */}
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
-          <h2 className="text-base font-bold text-white tracking-tight">QUICK ACTIONS</h2>
+        {/* Quick Operations Shortcuts */}
+        <div className="apple-card p-6 space-y-4">
+          <h2 className="text-base font-bold text-white tracking-tight">Quick Shortcuts</h2>
 
           <div className="space-y-3">
             <button
               onClick={() => setActiveTab('customers_3d')}
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/40 text-left flex items-center justify-between cursor-pointer transition-all"
+              className="w-full p-4 rounded-2xl bg-slate-950/60 border border-white/5 hover:border-blue-500/40 text-left flex items-center justify-between cursor-pointer transition-all"
             >
               <div>
-                <div className="text-xs font-bold text-blue-400 font-mono">CUSTOMER CRM</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Manage accounts & follow-up notes</div>
+                <div className="text-xs font-bold text-blue-400">Customer CRM</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">Manage clients & follow-up notes</div>
               </div>
               <ArrowRight className="w-4 h-4 text-blue-400" />
             </button>
 
             <button
               onClick={() => setActiveTab('products')}
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/40 text-left flex items-center justify-between cursor-pointer transition-all"
+              className="w-full p-4 rounded-2xl bg-slate-950/60 border border-white/5 hover:border-blue-500/40 text-left flex items-center justify-between cursor-pointer transition-all"
             >
               <div>
-                <div className="text-xs font-bold text-blue-400 font-mono">PRODUCT CATALOG</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Adjust stock & view shelf locations</div>
+                <div className="text-xs font-bold text-blue-400">Product Inventory</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">Adjust stock & view catalog</div>
               </div>
               <ArrowRight className="w-4 h-4 text-blue-400" />
             </button>
 
             <button
               onClick={() => setActiveTab('challans')}
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/40 text-left flex items-center justify-between cursor-pointer transition-all"
+              className="w-full p-4 rounded-2xl bg-slate-950/60 border border-white/5 hover:border-amber-500/40 text-left flex items-center justify-between cursor-pointer transition-all"
             >
               <div>
-                <div className="text-xs font-bold text-amber-400 font-mono">DISPATCH SALES CHALLAN</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Generate orders with stock protection</div>
+                <div className="text-xs font-bold text-amber-400">Sales Challans</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">Dispatch orders with stock protection</div>
               </div>
               <ArrowRight className="w-4 h-4 text-amber-400" />
             </button>
