@@ -1,42 +1,77 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthStore } from './store/useAuthStore';
-import { useWarehouseStore } from './store/useWarehouseStore';
+import { Product3D } from './store/useWarehouseStore';
 
-import { Navbar } from './components/Navbar';
-import { Sidebar } from './components/Sidebar';
 import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { CustomerCrmPage } from './pages/CustomerCrmPage';
-import { InventoryPage } from './pages/InventoryPage';
-import { SalesChallanPage } from './pages/SalesChallanPage';
-import { StockLogsPage } from './pages/StockLogsPage';
+import { SpatialWarehouseWorld } from './components/3d/SpatialWarehouseWorld';
+import { SpatialNavDock } from './components/SpatialNavDock';
+import { SpatialGlassHUD } from './components/SpatialGlassHUD';
+import { apiRequest } from './services/api';
 
 export function App() {
   const { isAuthenticated } = useAuthStore();
-  const { activeTab } = useWarehouseStore();
+  const [sector, setSector] = useState<'entry' | 'racks' | 'crm' | 'dispatch' | 'conveyor' | 'reports'>('racks');
+
+  const [products, setProducts] = useState<Product3D[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [challans, setChallans] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
+
+  const fetchSpatialWorldData = async () => {
+    try {
+      const [pRes, cRes, chRes, lRes] = await Promise.all([
+        apiRequest('/products'),
+        apiRequest('/customers'),
+        apiRequest('/challans'),
+        apiRequest('/products/logs?limit=50'),
+      ]);
+      setProducts(pRes.data || []);
+      setCustomers(cRes.data || []);
+      setChallans(chRes.data || []);
+      setLogs(lRes.data || []);
+    } catch (err) {
+      console.error('Failed to load spatial world telemetry data', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchSpatialWorldData();
+    }
+  }, [isAuthenticated, sector]);
 
   if (!isAuthenticated) {
     return <LoginPage onSuccess={() => {}} />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
-      {/* Top Navbar */}
-      <Navbar />
+    <div className="relative w-screen h-screen overflow-hidden bg-[#05070A] font-sans">
+      
+      {/* Persistent 3D Spatial Digital Twin World */}
+      <SpatialWarehouseWorld
+        products={products}
+        customers={customers}
+        selectedSector={sector}
+        onSelectProduct={() => setSector('racks')}
+        onSelectCustomer={() => setSector('crm')}
+      />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar */}
-        <Sidebar />
+      {/* Floating Spatial Sector Dock Bar */}
+      <SpatialNavDock
+        activeSector={sector}
+        onSelectSector={(s) => setSector(s)}
+      />
 
-        {/* Main Content Viewport */}
-        <main className="flex-1 overflow-y-auto bg-slate-950">
-          {activeTab === 'mission_control' && <DashboardPage />}
-          {activeTab === 'customers_3d' && <CustomerCrmPage />}
-          {activeTab === 'products' && <InventoryPage />}
-          {activeTab === 'challans' && <SalesChallanPage />}
-          {activeTab === 'logs' && <StockLogsPage />}
-        </main>
-      </div>
+      {/* Suspended Spatial Glass HUD Overlays */}
+      <SpatialGlassHUD
+        sector={sector}
+        products={products}
+        customers={customers}
+        challans={challans}
+        logs={logs}
+        onRefresh={fetchSpatialWorldData}
+      />
+
     </div>
   );
 }
