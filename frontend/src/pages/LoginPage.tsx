@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, User, AlertCircle, ArrowRight, Shield } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -35,42 +35,46 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       setAuth(res.data.user, res.data.accessToken);
       onSuccess();
     } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+      setError(err.message || 'Invalid authentication credentials');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-100">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+    <div className="min-h-screen w-full bg-[#080c14] flex items-center justify-center p-6 font-sans text-slate-100 relative overflow-hidden">
+      
+      {/* Soft Ambient Radial Background Blur */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="w-full max-w-md apple-glass rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 border border-white/10">
         
-        {/* Header */}
+        {/* Apple-style Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-2xl bg-blue-600/10 border border-blue-500/30 text-blue-400 mb-2">
-            <Shield className="w-8 h-8" />
+          <div className="inline-flex p-3 rounded-2xl bg-white/5 border border-white/10 text-blue-400 mb-1 shadow-inner">
+            <ShieldCheck className="w-7 h-7 text-blue-400" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">ERPFlow Admin Portal</h1>
-          <p className="text-xs text-slate-400 font-mono">Sign in with role-based access credentials.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white">ERPFlow Portal</h1>
+          <p className="text-xs text-slate-400 font-sans">Enterprise Operations & CRM OS</p>
         </div>
 
-        {/* Role Quick Presets */}
-        <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-2">
-          <div className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider text-center">
-            Role Preset Accounts (Passcode: password123)
+        {/* Quick Role Clearance Pills */}
+        <div className="bg-slate-950/60 p-3 rounded-2xl border border-white/5 space-y-2">
+          <div className="text-[10px] font-mono text-slate-400 text-center uppercase tracking-widest">
+            Role Clearances (Passcode: password123)
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-wrap justify-center gap-1.5">
             {[
-              { role: 'Admin', email: 'admin@erpflow.com', color: 'border-red-500/30 text-red-400 bg-red-500/5' },
-              { role: 'Sales', email: 'sales@erpflow.com', color: 'border-blue-500/30 text-blue-400 bg-blue-500/5' },
-              { role: 'Warehouse', email: 'warehouse@erpflow.com', color: 'border-amber-500/30 text-amber-400 bg-amber-500/5' },
-              { role: 'Accounts', email: 'accounts@erpflow.com', color: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5' },
+              { role: 'Admin', email: 'admin@erpflow.com', style: 'apple-pill-red' },
+              { role: 'Sales', email: 'sales@erpflow.com', style: 'apple-pill-blue' },
+              { role: 'Warehouse', email: 'warehouse@erpflow.com', style: 'apple-pill-amber' },
+              { role: 'Accounts', email: 'accounts@erpflow.com', style: 'apple-pill-green' },
             ].map((r) => (
               <button
                 key={r.role}
                 type="button"
                 onClick={() => handleRolePreset(r.email)}
-                className={`py-1.5 px-2 rounded-lg text-xs font-mono border text-center transition-colors cursor-pointer hover:bg-slate-800 ${r.color}`}
+                className={`px-3 py-1 rounded-full text-xs font-mono transition-all hover:scale-105 cursor-pointer ${r.style}`}
               >
                 {r.role}
               </button>
@@ -81,15 +85,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-red-300 text-xs flex items-center gap-2 font-mono">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{error}</span>
+            <div className="p-3 rounded-2xl apple-pill-red text-xs font-mono text-center">
+              {error}
             </div>
           )}
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-blue-400" />
+              <Mail className="w-3.5 h-3.5 text-blue-400" />
               EMAIL ADDRESS
             </label>
             <input
@@ -97,12 +100,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-mono focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="user@erpflow.com"
             />
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-blue-400" />
               PASSCODE
@@ -112,7 +115,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-mono focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="••••••••••••"
             />
           </div>
@@ -120,13 +123,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm font-mono shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
           >
             {loading ? (
               <span>Authenticating...</span>
             ) : (
               <>
-                <span>SIGN IN TO PORTAL</span>
+                <span>Sign In to Portal</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
