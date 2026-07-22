@@ -6,6 +6,8 @@ node_modules/
 dist/
 build/
 .output/
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # Environment files
 .env
