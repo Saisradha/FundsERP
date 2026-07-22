@@ -2,80 +2,73 @@
 
 @layer base {
   :root {
-    --bg-dark: #05070A;
-    --steel: #141820;
-    --concrete: #1B212C;
-    --surface: #222A38;
-    --glass: rgba(255, 255, 255, 0.06);
-    --primary: #3B82F6;
+    --bg-light: #F4F7FA;
+    --primary: #2563EB;
+    --accent: #F59E0B;
     --success: #10B981;
-    --warning: #F59E0B;
     --danger: #EF4444;
-    --text: #F8FAFC;
-    --muted: #94A3B8;
     --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: var(--bg-dark);
-    color: var(--text);
+    background-color: var(--bg-light);
+    color: #1E293B;
     overflow: hidden;
     margin: 0;
     padding: 0;
   }
 }
 
-/* Spatial Glass Container Surface */
-.spatial-glass {
-  background: rgba(34, 42, 56, 0.45);
+/* Light Glassmorphism Surfaces */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.12), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
 }
 
-.spatial-card {
-  background: rgba(27, 33, 44, 0.6);
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 1.25rem;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.spatial-card:hover {
-  background: rgba(34, 42, 56, 0.75);
-  border-color: rgba(59, 130, 246, 0.3);
-  box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.15);
   transform: translateY(-2px);
 }
 
-/* Spatial Badges */
-.spatial-chip-primary {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60A5FA;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+/* Status Badges */
+.chip-primary {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563EB;
+  border: 1px solid rgba(37, 99, 235, 0.25);
 }
 
-.spatial-chip-success {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34D399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+.chip-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-.spatial-chip-warning {
-  background: rgba(245, 158, 11, 0.15);
-  color: #FBBF24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+.chip-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
-.spatial-chip-danger {
-  background: rgba(239, 68, 68, 0.15);
-  color: #F87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+.chip-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 /* Custom Scrollbars */
@@ -85,14 +78,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(5, 7, 10, 0.9);
+  background: rgba(244, 247, 250, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(34, 42, 56, 0.8);
+  background: rgba(203, 213, 225, 0.8);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.8);
+  background: rgba(37, 99, 235, 0.7);
 }
