@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Plus, 
-  Search, 
-  AlertTriangle, 
-  Trash2, 
-  CheckCircle, 
-  Clock, 
-  User, 
-  MessageSquare, 
-  Filter,
-  DollarSign,
-  TrendingUp,
-  MapPin
+import { motion } from 'framer-motion';
+import {
+  X, Plus, Search, Trash2, MapPin
 } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { Product3D } from '../store/useWarehouseStore';
+import { Button } from './ui/Button';
+import { Input, Select } from './ui/Input';
+import { Modal } from './ui/Modal';
+import { Badge } from './ui/Badge';
+import { EmptyState } from './ui/EmptyState';
+import { toast } from './ui/Toast';
 
 interface RightGlassPanelProps {
   module: 'dashboard' | 'inventory' | 'crm' | 'challans' | 'logs' | 'reports';
@@ -28,53 +23,33 @@ interface RightGlassPanelProps {
 }
 
 export const RightGlassPanel: React.FC<RightGlassPanelProps> = ({
-  module,
-  onClose,
-  products,
-  customers,
-  challans,
-  logs,
-  onRefresh,
+  module, onClose, products, customers, challans, logs, onRefresh,
 }) => {
   if (module === 'dashboard') return null;
 
-  // Inventory State
+  // Inventory state
   const [selectedProduct, setSelectedProduct] = useState<Product3D | null>(null);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [stockAdjQty, setStockAdjQty] = useState(10);
   const [stockAdjType, setStockAdjType] = useState<'IN' | 'OUT'>('IN');
-  const [stockAdjReason, setStockAdjReason] = useState('Supplier Shipment Arrival');
+  const [stockAdjReason, setStockAdjReason] = useState('Supplier Shipment');
   const [newProduct, setNewProduct] = useState({
-    name: '',
-    sku: '',
-    category: 'Power Units',
-    unitPrice: 120,
-    currentStock: 50,
-    minStockAlert: 10,
-    location: 'Zone Alpha - Shelf 01',
+    name: '', sku: '', category: 'Power Units', unitPrice: 120,
+    currentStock: 50, minStockAlert: 10, location: 'Zone Alpha - Shelf 01',
   });
 
-  // CRM State
-  const [selectedCustomer, setSelectedCustomer] = useState<any | null>(null);
+  // CRM state
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [newCustData, setNewCustData] = useState({
-    name: '',
-    mobile: '',
-    email: '',
-    businessName: '',
-    customerType: 'RETAIL',
-    address: '',
-    status: 'LEAD',
-    initialNote: '',
+    name: '', mobile: '', email: '', businessName: '',
+    customerType: 'RETAIL', address: '', status: 'LEAD', initialNote: '',
   });
 
-  // Challan State
+  // Challan state
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   const [cart, setCart] = useState<Array<{ productId: string; quantity: number }>>([]);
-  const [challanStatus, setChallanStatus] = useState<'DRAFT' | 'CONFIRMED'>('CONFIRMED');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
 
   // Handlers
   const handleAdjustStock = async (e: React.FormEvent) => {
@@ -82,32 +57,22 @@ export const RightGlassPanel: React.FC<RightGlassPanelProps> = ({
     if (!selectedProduct) return;
     try {
       await apiRequest(`/products/${selectedProduct.id}/stock`, {
-        method: 'POST',
-        body: JSON.stringify({
-          quantity: stockAdjQty,
-          type: stockAdjType,
-          reason: stockAdjReason,
-        }),
+        method: 'POST', body: JSON.stringify({ quantity: stockAdjQty, type: stockAdjType, reason: stockAdjReason }),
       });
+      toast.success(`Stock adjusted by ${stockAdjQty} units`);
       setSelectedProduct(null);
       onRefresh();
-    } catch (err: any) {
-      alert(err.message || 'Stock adjustment failed');
-    }
+    } catch (err: any) { toast.error(err.message || 'Stock adjustment failed'); }
   };
 
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiRequest('/products', {
-        method: 'POST',
-        body: JSON.stringify(newProduct),
-      });
+      await apiRequest('/products', { method: 'POST', body: JSON.stringify(newProduct) });
+      toast.success('Product created');
       setShowAddProduct(false);
       onRefresh();
-    } catch (err: any) {
-      alert(err.message || 'Failed to create product');
-    }
+    } catch (err: any) { toast.error(err.message || 'Failed'); }
   };
 
   const handleAddNote = async (e: React.FormEvent) => {
@@ -115,405 +80,257 @@ export const RightGlassPanel: React.FC<RightGlassPanelProps> = ({
     if (!selectedCustomer || !newNote.trim()) return;
     try {
       await apiRequest(`/customers/${selectedCustomer.id}/notes`, {
-        method: 'POST',
-        body: JSON.stringify({ note: newNote }),
+        method: 'POST', body: JSON.stringify({ note: newNote }),
       });
       setNewNote('');
       const updated = await apiRequest(`/customers/${selectedCustomer.id}`);
       setSelectedCustomer(updated.data);
+      toast.success('Note added');
       onRefresh();
-    } catch (err: any) {
-      alert(err.message || 'Failed to add note');
-    }
+    } catch (err: any) { toast.error(err.message || 'Failed'); }
   };
 
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiRequest('/customers', {
-        method: 'POST',
-        body: JSON.stringify(newCustData),
-      });
+      await apiRequest('/customers', { method: 'POST', body: JSON.stringify(newCustData) });
+      toast.success('Customer created');
       setShowAddCustomer(false);
       onRefresh();
-    } catch (err: any) {
-      alert(err.message || 'Failed to create customer');
-    }
+    } catch (err: any) { toast.error(err.message || 'Failed'); }
   };
 
   const handleCreateChallan = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage('');
-    setSuccessMessage('');
-
-    if (!selectedCustomerId || cart.length === 0) {
-      setErrorMessage('Select a customer and at least one product SKU.');
-      return;
-    }
-
+    if (!selectedCustomerId || cart.length === 0) { toast.warning('Select customer and products'); return; }
     try {
       const res = await apiRequest('/challans', {
-        method: 'POST',
-        body: JSON.stringify({
-          customerId: selectedCustomerId,
-          items: cart,
-          status: challanStatus,
-        }),
+        method: 'POST', body: JSON.stringify({ customerId: selectedCustomerId, items: cart, status: 'CONFIRMED' }),
       });
-
-      setSuccessMessage(`Sales Challan #${res.data.challanNumber} generated!`);
-      setCart([]);
-      setSelectedCustomerId('');
-      onRefresh();
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Challan generation failed');
-    }
+      toast.success(`Challan #${res.data.challanNumber} created!`);
+      setCart([]); setSelectedCustomerId(''); onRefresh();
+    } catch (err: any) { toast.error(err.message || 'Failed'); }
   };
 
-  const calculateCartTotal = () => {
-    return cart.reduce((total, item) => {
-      const p = products.find((prod) => prod.id === item.productId);
-      return total + (p ? p.unitPrice * item.quantity : 0);
-    }, 0);
+  const cartTotal = cart.reduce((tot, item) => {
+    const p = products.find((prod) => prod.id === item.productId);
+    return tot + (p ? p.unitPrice * item.quantity : 0);
+  }, 0);
+
+  const moduleTitle: Record<string, string> = {
+    inventory: '📦 Warehouse Inventory',
+    crm: '🏢 Customer CRM',
+    challans: '🚚 Sales Challans',
+    logs: '📋 Audit Logs',
+    reports: '📈 Reports',
   };
 
   return (
-    <aside className="fixed top-24 right-6 bottom-6 w-full max-w-xl z-30 glass-panel rounded-3xl p-6 shadow-2xl overflow-y-auto flex flex-col font-sans border border-white/20">
-      
-      {/* Panel Header */}
-      <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
-        <div>
-          <span className="text-[10px] font-mono font-bold text-blue-400 uppercase tracking-widest">BUILDING MODULE</span>
-          <h2 className="text-xl font-extrabold text-white capitalize">
-            {module === 'inventory' && '📦 Warehouse Inventory Racks'}
-            {module === 'crm' && '🏢 CRM Office Accounts'}
-            {module === 'challans' && '🚚 Dispatch Loading Dock'}
-            {module === 'logs' && '📋 Audit & Stock Movement Logs'}
-            {module === 'reports' && '📈 Operations Spire Analytics'}
-          </h2>
-        </div>
-
-        <button
-          onClick={onClose}
-          className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer border border-white/10"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* 1. Inventory View */}
-      {module === 'inventory' && (
-        <div className="space-y-4 flex-1">
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-300 font-mono">{products.length} Products Logged</span>
-            <button
-              onClick={() => setShowAddProduct(true)}
-              className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-500/30 flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Register SKU</span>
+    <>
+      <motion.aside
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 24 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-20 right-4 bottom-4 w-full max-w-lg z-30 rounded-2xl p-5 shadow-2xl overflow-y-auto flex flex-col border backdrop-blur-xl"
+        style={{
+          background: 'var(--color-glass-bg)',
+          borderColor: 'var(--color-glass-border)',
+          boxShadow: 'var(--color-glass-shadow)',
+        }}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center pb-4 mb-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
+          <div>
+            <span className="text-[10px] font-mono font-medium" style={{ color: 'var(--color-primary)' }}>MODULE</span>
+            <h2 className="text-base font-bold" style={{ color: 'var(--color-text)' }}>
+              {moduleTitle[module] || module}
+            </h2>
+          </div>
+          <div className="flex gap-2">
+            {module === 'inventory' && (
+              <Button size="sm" icon={<Plus className="w-3.5 h-3.5" />} onClick={() => setShowAddProduct(true)}>Add</Button>
+            )}
+            {module === 'crm' && (
+              <Button size="sm" icon={<Plus className="w-3.5 h-3.5" />} onClick={() => setShowAddCustomer(true)}>Add</Button>
+            )}
+            <button onClick={onClose} className="p-2 rounded-lg cursor-pointer border"
+              style={{ background: 'var(--color-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
+              <X className="w-4 h-4" />
             </button>
           </div>
+        </div>
 
-          <div className="space-y-2.5">
+        {/* INVENTORY */}
+        {module === 'inventory' && (
+          <div className="space-y-2.5 flex-1">
+            <span className="text-xs font-mono" style={{ color: 'var(--color-text-secondary)' }}>{products.length} Products</span>
             {products.map((p) => {
               const isLow = p.currentStock <= p.minStockAlert && p.currentStock > 0;
               const isOut = p.currentStock === 0;
-
               return (
-                <div key={p.id} className="glass-card p-4 space-y-2 text-xs border border-white/10 bg-slate-900/90">
+                <div key={p.id} className="p-3.5 rounded-xl border space-y-2 text-xs" style={{
+                  background: 'var(--color-card)', borderColor: 'var(--color-border)',
+                }}>
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="font-bold text-white text-sm">{p.name}</div>
-                      <div className="text-[10px] font-mono text-blue-400 font-bold">{p.sku}</div>
+                      <div className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>{p.name}</div>
+                      <div className="text-[10px] font-mono" style={{ color: 'var(--color-primary)' }}>{p.sku}</div>
                     </div>
-                    <span className={`px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] ${
-                      isOut ? 'chip-danger' : isLow ? 'chip-warning' : 'chip-success'
-                    }`}>
-                      {p.currentStock} Qty
-                    </span>
+                    <Badge variant={isOut ? 'danger' : isLow ? 'warning' : 'success'}>{p.currentStock} Qty</Badge>
                   </div>
-
-                  <div className="text-slate-300 font-mono flex justify-between">
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-blue-400" /> {p.location}</span>
-                    <span className="text-emerald-400 font-bold">${p.unitPrice.toFixed(2)}</span>
+                  <div className="flex justify-between font-mono" style={{ color: 'var(--color-text-secondary)' }}>
+                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" style={{ color: 'var(--color-primary)' }} /> {p.location}</span>
+                    <span style={{ color: 'var(--color-success)' }}>${p.unitPrice.toFixed(2)}</span>
                   </div>
-
-                  <button
-                    onClick={() => setSelectedProduct(p)}
-                    className="w-full py-2 rounded-full bg-white/10 hover:bg-blue-600/30 text-white font-bold transition-all cursor-pointer border border-white/10"
-                  >
-                    Adjust Stock Level
-                  </button>
+                  <Button variant="secondary" size="sm" className="w-full" onClick={() => setSelectedProduct(p)}>Adjust Stock</Button>
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* 2. CRM View */}
-      {module === 'crm' && (
-        <div className="space-y-4 flex-1">
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-slate-300 font-mono">{customers.length} Client Accounts</span>
-            <button
-              onClick={() => setShowAddCustomer(true)}
-              className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-500/30 flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Customer</span>
-            </button>
-          </div>
-
-          <div className="space-y-2.5">
+        {/* CRM */}
+        {module === 'crm' && (
+          <div className="space-y-2.5 flex-1">
             {customers.map((c) => (
-              <div key={c.id} className="glass-card p-4 space-y-2 text-xs border border-white/10 bg-slate-900/90">
+              <div key={c.id} className="p-3.5 rounded-xl border space-y-2 text-xs" style={{
+                background: 'var(--color-card)', borderColor: 'var(--color-border)',
+              }}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-bold text-white text-sm">{c.name}</div>
-                    <div className="text-[10px] font-mono text-blue-400 font-bold">{c.businessName}</div>
+                    <div className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>{c.name}</div>
+                    <div className="text-[10px] font-mono" style={{ color: 'var(--color-primary)' }}>{c.businessName}</div>
                   </div>
-                  <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] ${
-                    c.status === 'ACTIVE' ? 'chip-success' : c.status === 'LEAD' ? 'chip-warning' : 'chip-danger'
-                  }`}>
-                    {c.status}
-                  </span>
+                  <Badge variant={c.status === 'ACTIVE' ? 'success' : c.status === 'LEAD' ? 'warning' : 'danger'}>{c.status}</Badge>
                 </div>
-
-                <div className="text-slate-300 font-mono text-[11px]">{c.email} • {c.mobile}</div>
-
-                <button
-                  onClick={() => setSelectedCustomer(c)}
-                  className="w-full py-2 rounded-full bg-white/10 hover:bg-blue-600/30 text-white font-bold transition-all cursor-pointer border border-white/10"
-                >
-                  Inspect Follow-up Notes ({c.notes?.length || 0})
-                </button>
+                <div className="font-mono text-[11px]" style={{ color: 'var(--color-text-secondary)' }}>{c.email}</div>
+                <Button variant="secondary" size="sm" className="w-full" onClick={() => setSelectedCustomer(c)}>
+                  Notes ({c.notes?.length || 0})
+                </Button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* 3. Dispatch Dock Sales Challan View */}
-      {module === 'challans' && (
-        <div className="space-y-4 flex-1 font-sans text-xs">
-          {errorMessage && <div className="p-3 rounded-2xl chip-danger font-mono">{errorMessage}</div>}
-          {successMessage && <div className="p-3 rounded-2xl chip-success font-mono">{successMessage}</div>}
-
-          <form onSubmit={handleCreateChallan} className="space-y-3 font-mono">
-            <div>
-              <label className="text-slate-300 text-[10px]">SELECT CUSTOMER *</label>
-              <select
-                value={selectedCustomerId}
-                onChange={(e) => setSelectedCustomerId(e.target.value)}
-                className="w-full p-3 rounded-2xl bg-slate-900 border border-white/15 text-white font-sans"
-              >
-                <option value="">-- Choose Customer --</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name} ({c.businessName})</option>
-                ))}
-              </select>
+        {/* CHALLANS */}
+        {module === 'challans' && (
+          <form onSubmit={handleCreateChallan} className="space-y-4 flex-1 text-xs">
+            <Select placeholder="-- Choose Customer --" value={selectedCustomerId}
+              onChange={(e) => setSelectedCustomerId(e.target.value)}
+              options={customers.map((c) => ({ value: c.id, label: `${c.name} (${c.businessName})` }))} />
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {products.map((p) => (
+                <button key={p.id} type="button" disabled={p.currentStock === 0}
+                  onClick={() => setCart((prev) => {
+                    const ex = prev.find((i) => i.productId === p.id);
+                    if (ex) return prev.map((i) => i.productId === p.id ? { ...i, quantity: i.quantity + 1 } : i);
+                    return [...prev, { productId: p.id, quantity: 1 }];
+                  })}
+                  className="px-3 py-1.5 rounded-lg text-[10px] shrink-0 disabled:opacity-30 cursor-pointer border font-medium"
+                  style={{ background: 'var(--color-input)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
+                  + {p.name}
+                </button>
+              ))}
             </div>
-
-            <div>
-              <label className="text-slate-300 text-[10px]">ADD PRODUCTS TO DISPATCH</label>
-              <div className="flex gap-2 max-w-full overflow-x-auto pb-1">
-                {products.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    disabled={p.currentStock === 0}
-                    onClick={() => {
-                      setCart((prev) => {
-                        const existing = prev.find((i) => i.productId === p.id);
-                        if (existing) return prev.map((i) => i.productId === p.id ? { ...i, quantity: i.quantity + 1 } : i);
-                        return [...prev, { productId: p.id, quantity: 1 }];
-                      });
-                    }}
-                    className="px-3 py-1.5 rounded-full bg-slate-800 border border-white/15 text-white hover:border-blue-500 text-[10px] shrink-0 disabled:opacity-30 cursor-pointer font-sans"
-                  >
-                    + {p.name} (${p.unitPrice})
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {cart.length > 0 && (
-              <div className="p-3 rounded-2xl bg-slate-900 border border-white/15 space-y-2">
+              <div className="p-3 rounded-xl border space-y-2" style={{ background: 'var(--color-input)', borderColor: 'var(--color-border)' }}>
                 {cart.map((item) => {
                   const p = products.find((prod) => prod.id === item.productId);
                   if (!p) return null;
                   return (
-                    <div key={item.productId} className="flex justify-between items-center text-white font-sans">
+                    <div key={item.productId} className="flex justify-between items-center" style={{ color: 'var(--color-text)' }}>
                       <span>{p.name}</span>
                       <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min="1"
-                          max={p.currentStock}
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value, 10);
-                            setCart((prev) => prev.map((i) => i.productId === item.productId ? { ...i, quantity: val } : i));
-                          }}
-                          className="w-14 p-1 rounded-full bg-slate-950 border border-white/20 text-center text-white font-bold"
-                        />
-                        <button type="button" onClick={() => setCart((prev) => prev.filter((i) => i.productId !== item.productId))}>
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
+                        <input type="number" min="1" max={p.currentStock} value={item.quantity}
+                          onChange={(e) => setCart((prev) => prev.map((i) => i.productId === item.productId ? { ...i, quantity: parseInt(e.target.value, 10) } : i))}
+                          className="w-14 p-1 rounded-lg text-center font-bold input-field" />
+                        <button type="button" onClick={() => setCart((prev) => prev.filter((i) => i.productId !== item.productId))}
+                          className="cursor-pointer" style={{ color: 'var(--color-danger)' }}><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
-
             <div className="flex justify-between items-center pt-2">
               <div>
-                <span className="text-[10px] text-slate-400 font-sans">ORDER VALUE</span>
-                <div className="text-xl font-extrabold text-emerald-400">${calculateCartTotal().toFixed(2)}</div>
+                <span className="input-label">TOTAL</span>
+                <div className="text-lg font-bold font-mono" style={{ color: 'var(--color-success)' }}>${cartTotal.toFixed(2)}</div>
               </div>
-
-              <button
-                type="submit"
-                className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-sans font-semibold cursor-pointer shadow-md shadow-blue-500/30"
-              >
-                Confirm & Deduct Stock
-              </button>
+              <Button type="submit">Confirm</Button>
             </div>
           </form>
-        </div>
-      )}
+        )}
 
-      {/* 4. Stock Movement Audit Logs View */}
-      {module === 'logs' && (
-        <div className="space-y-3 flex-1 font-mono text-xs">
-          {logs.map((l) => (
-            <div key={l.id} className="glass-card p-3.5 space-y-1 bg-slate-900/90 border border-white/10">
-              <div className="flex justify-between items-center">
-                <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                  l.type === 'IN' ? 'chip-success' : 'chip-warning'
-                }`}>
-                  {l.type}
+        {/* LOGS */}
+        {module === 'logs' && (
+          <div className="space-y-2 flex-1">
+            {logs.map((l) => (
+              <div key={l.id} className="p-3 rounded-xl border flex justify-between items-center" style={{
+                background: 'var(--color-card)', borderColor: 'var(--color-border)',
+              }}>
+                <div className="flex items-center gap-2.5">
+                  <Badge variant={l.type === 'IN' ? 'success' : 'warning'}>{l.type}</Badge>
+                  <div>
+                    <div className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>{l.product?.name}</div>
+                    <div className="text-[10px] font-mono" style={{ color: 'var(--color-text-tertiary)' }}>{l.reason}</div>
+                  </div>
+                </div>
+                <span className="font-mono font-bold text-xs" style={{ color: l.type === 'IN' ? 'var(--color-success)' : 'var(--color-warning)' }}>
+                  {l.type === 'IN' ? '+' : '-'}{l.quantity}
                 </span>
-                <span className="text-slate-400 text-[10px]">{new Date(l.createdAt).toLocaleTimeString()}</span>
               </div>
-
-              <div className="font-bold text-white font-sans text-sm">{l.product?.name}</div>
-              <div className="text-slate-300 text-[11px] font-sans">{l.reason} • By {l.createdBy}</div>
-              <div className={`font-bold ${l.type === 'IN' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                {l.type === 'IN' ? `+${l.quantity}` : `-${l.quantity}`} Units
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Modals for Adjust Stock / Add Customer */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 text-xs font-sans">
-          <div className="w-full max-w-md glass-panel p-6 rounded-3xl space-y-4 border border-white/20 bg-slate-900">
-            <div className="flex justify-between items-center">
-              <h3 className="text-base font-bold text-white">Adjust Stock: {selectedProduct.name}</h3>
-              <button onClick={() => setSelectedProduct(null)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAdjustStock} className="space-y-3 font-mono">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setStockAdjType('IN')}
-                  className={`py-2 rounded-full font-bold ${stockAdjType === 'IN' ? 'chip-success' : 'bg-slate-800 text-slate-300'}`}
-                >
-                  IN (+ Receiving)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStockAdjType('OUT')}
-                  className={`py-2 rounded-full font-bold ${stockAdjType === 'OUT' ? 'chip-warning' : 'bg-slate-800 text-slate-300'}`}
-                >
-                  OUT (- Dispatch)
-                </button>
-              </div>
-
-              <div>
-                <label className="text-slate-300 text-[10px]">QUANTITY CHANGED</label>
-                <input
-                  type="number"
-                  min="1"
-                  required
-                  value={stockAdjQty}
-                  onChange={(e) => setStockAdjQty(parseInt(e.target.value, 10))}
-                  className="w-full p-2.5 rounded-2xl bg-slate-950 border border-white/20 text-white font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="text-slate-300 text-[10px]">AUDIT REASON</label>
-                <input
-                  type="text"
-                  required
-                  value={stockAdjReason}
-                  onChange={(e) => setStockAdjReason(e.target.value)}
-                  className="w-full p-2.5 rounded-2xl bg-slate-950 border border-white/20 text-white font-sans"
-                />
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2 font-sans">
-                <button type="button" onClick={() => setSelectedProduct(null)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-full font-semibold">
-                  Cancel
-                </button>
-                <button type="submit" className="px-5 py-2 bg-blue-600 text-white rounded-full font-semibold">
-                  Save Stock Level
-                </button>
-              </div>
-            </form>
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </motion.aside>
 
-      {selectedCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 text-xs font-sans">
-          <div className="w-full max-w-lg glass-panel p-6 rounded-3xl space-y-4 border border-white/20 bg-slate-900">
-            <div className="flex justify-between items-center">
-              <h3 className="text-base font-bold text-white">{selectedCustomer.name} CRM Notes</h3>
-              <button onClick={() => setSelectedCustomer(null)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
+      {/* Modals */}
+      <Modal open={!!selectedProduct} onClose={() => setSelectedProduct(null)} title="Adjust Stock" subtitle={selectedProduct?.sku} size="sm">
+        {selectedProduct && (
+          <form onSubmit={handleAdjustStock} className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              {(['IN', 'OUT'] as const).map((type) => (
+                <button key={type} type="button" onClick={() => setStockAdjType(type)}
+                  className={`py-2 rounded-lg font-semibold text-xs cursor-pointer ${stockAdjType === type ? (type === 'IN' ? 'chip-success' : 'chip-warning') : ''}`}
+                  style={stockAdjType !== type ? { background: 'var(--color-input)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' } : {}}>
+                  {type === 'IN' ? 'IN (+)' : 'OUT (-)'}
+                </button>
+              ))}
             </div>
+            <Input label="QUANTITY" type="number" min={1} required value={stockAdjQty}
+              onChange={(e) => setStockAdjQty(parseInt(e.target.value, 10))} />
+            <Input label="REASON" required value={stockAdjReason} onChange={(e) => setStockAdjReason(e.target.value)} />
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="secondary" type="button" onClick={() => setSelectedProduct(null)}>Cancel</Button>
+              <Button type="submit">Save</Button>
+            </div>
+          </form>
+        )}
+      </Modal>
 
-            <div className="space-y-2 max-h-40 overflow-y-auto font-mono">
+      <Modal open={!!selectedCustomer} onClose={() => setSelectedCustomer(null)} title={selectedCustomer?.name} subtitle={selectedCustomer?.businessName} size="md">
+        {selectedCustomer && (
+          <div className="space-y-3">
+            <div className="space-y-2 max-h-40 overflow-y-auto">
               {selectedCustomer.notes?.map((n: any) => (
-                <div key={n.id} className="p-3 rounded-2xl bg-slate-950 border border-white/10">
-                  <p className="text-slate-200 font-sans">{n.note}</p>
-                  <div className="text-[10px] text-slate-400 mt-1 flex justify-between">
+                <div key={n.id} className="p-3 rounded-xl border" style={{ background: 'var(--color-input)', borderColor: 'var(--color-border)' }}>
+                  <p className="text-xs" style={{ color: 'var(--color-text)' }}>{n.note}</p>
+                  <div className="text-[10px] mt-1 flex justify-between font-mono" style={{ color: 'var(--color-text-tertiary)' }}>
                     <span>By {n.createdBy}</span>
                     <span>{new Date(n.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               ))}
             </div>
-
-            <form onSubmit={handleAddNote} className="flex gap-2 font-mono">
-              <input
-                type="text"
-                required
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                placeholder="Add note..."
-                className="flex-1 px-4 py-2 rounded-full bg-slate-950 border border-white/20 text-white"
-              />
-              <button type="submit" className="px-4 py-2 rounded-full bg-blue-600 text-white font-sans font-semibold">
-                Add
-              </button>
+            <form onSubmit={handleAddNote} className="flex gap-2">
+              <Input placeholder="Add note..." required value={newNote} onChange={(e) => setNewNote(e.target.value)} />
+              <Button type="submit" size="sm">Add</Button>
             </form>
           </div>
-        </div>
-      )}
-
-    </aside>
+        )}
+      </Modal>
+    </>
   );
 };
