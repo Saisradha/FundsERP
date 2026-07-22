@@ -70,9 +70,11 @@ export function App() {
         onSelectModule={(mod) => setActiveModule(mod)}
       />
 
-      {/* Mode A: Interactive Control Hub View Overlay */}
+      {/* Mode A: Interactive Control Hub View Overlay (High Contrast Crisp Background) */}
       {viewMode === 'hub' && (
-        <div className="absolute inset-0 overflow-y-auto z-10 bg-slate-950/20 backdrop-blur-sm">
+        <div className={`absolute inset-0 overflow-y-auto z-10 backdrop-blur-xl ${
+          theme === 'dark' ? 'bg-[#080C14]/92 text-white' : 'bg-[#F4F7FA]/92 text-slate-900'
+        }`}>
           <InteractiveHub
             products={products}
             customers={customers}
