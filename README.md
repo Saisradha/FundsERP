@@ -1,89 +1,321 @@
-# Mini ERP + CRM Operations Portal
+# 🚀 FundsERP
 
-> A clean, technological, high-performance **Mini ERP + CRM Operations Portal** built for wholesale and distribution companies, satisfying 100% of the case study PDF requirements.
+> **Modern ERP for Wholesale Distribution & Inventory Management**
 
----
-
-## 📋 Core Modules Implemented (100% PDF Spec Compliance)
-
-### 1. 🔐 Authentication and Role-Based Access Control
-- JWT-based authentication supporting **4 required user roles**:
-  - `Admin`: Full system access across all modules
-  - `Sales`: Customer CRM management and sales challan creation
-  - `Warehouse`: Product inventory management, stock IN/OUT adjustments, and movement logs
-  - `Accounts`: Order status updates and financial audit review
-
-#### Test Credentials (Passcode for all accounts: `password123`)
-| Role | Email |
-| :--- | :--- |
-| **Admin** | `admin@erpflow.com` |
-| **Sales** | `sales@erpflow.com` |
-| **Warehouse** | `warehouse@erpflow.com` |
-| **Accounts** | `accounts@erpflow.com` |
+FundsERP is a full-stack Enterprise Resource Planning (ERP) platform designed for wholesalers, distributors, and warehouse operations. It streamlines inventory management, customer records, supplier management, billing, purchase workflows, delivery challans, analytics, and business operations through a modern, responsive web interface.
 
 ---
 
-### 2. 👥 Customer CRM Module
-- **Fields**: Customer Name, Mobile Number, Email, Business Name, GST Number (Optional), Customer Type (`Retail`, `Wholesale`, `Distributor`), Address, Status (`Lead`, `Active`, `Inactive`), Follow-up Date, Notes.
-- **Features**: Add customer, Edit customer, Multi-field search, Filter by status, Customer detail view, and Follow-up notes timeline log.
+## ✨ Features
+
+### 📦 Inventory Management
+
+* Real-time stock tracking
+* Product catalog management
+* Category organization
+* Low-stock monitoring
+* Stock movement history
+
+### 👥 Customer Management
+
+* Customer database
+* Purchase history
+* Outstanding balance tracking
+* Search & filtering
+* Customer profiles
+
+### 🏢 Supplier Management
+
+* Supplier records
+* Purchase management
+* Contact management
+* Transaction history
+
+### 🛒 Purchase Management
+
+* Create purchase orders
+* Update inventory automatically
+* Purchase history
+* Supplier-wise purchases
+
+### 🧾 Sales & Billing
+
+* Invoice generation
+* Sales management
+* Order processing
+* Revenue tracking
+
+### 🚚 Delivery Challans
+
+* Draft & confirm challans
+* Shipment records
+* Delivery tracking
+* Print-ready challans
+
+### 📊 Dashboard & Analytics
+
+* Business KPIs
+* Revenue overview
+* Inventory insights
+* Sales statistics
+* Recent activities
+
+### 🔐 Authentication
+
+* Secure login
+* User authentication
+* Protected routes
+* Session management
 
 ---
 
-### 3. 📦 Product & Inventory Module
-- **Fields**: Product Name, SKU/code, Category, Unit Price, Current Stock, Minimum Stock Alert Quantity, Location/Warehouse Shelf.
-- **Features**: Add product, Edit product, Low-stock warning indicators, Manual stock adjustments (IN receiving / OUT dispatch).
-- **Stock Movement Log**: Immutable audit ledger tracking Product, Quantity Changed, Movement Type (`IN` / `OUT`), Reason, Operator, and Timestamp.
+# 🏗️ Tech Stack
+
+## Frontend
+
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* React Router
+
+## Backend
+
+* Node.js
+* Express.js
+* TypeScript
+
+## Database
+
+* PostgreSQL
+
+## ORM
+
+* Prisma
+
+## UI Components
+
+* shadcn/ui
+* Lucide Icons
+
+## Development Tools
+
+* ESLint
+* Prettier
+* Git
+* GitHub
 
 ---
 
-### 4. 📄 Sales Challan Module
-- **Fields**: Challan Number (Auto-generated `CH-2026-XXXX`), Customer, Products List, Total Quantity, Total Amount, Status (`Draft`, `Confirmed`, `Cancelled`), Created By, Created Date.
-- **Features & Business Logic**:
-  - Select customer & add multiple products with quantity.
-  - **Item Snapshotting**: Saves historical product name, SKU, and unit price snapshot data at order creation.
-  - **Strict Negative Stock Protection**: Confirming a challan atomically checks stock. If stock is insufficient, the system rejects the transaction with a clear error message.
-  - State machine transitions (`Draft` → `Confirmed` → `Cancelled`).
+# 📂 Project Structure
 
----
-
-## 🛠️ Required Tech Stack
-
-### Backend
-- **Node.js** + **TypeScript** + **Express.js**
-- **Prisma ORM** (Relational schema with SQLite local / Neon PostgreSQL production)
-- **JWT** Authentication + **Bcrypt** Hashing + **Zod** Validation
-
-### Frontend
-- **React 19** + **TypeScript** + **Vite 6**
-- **TailwindCSS** Clean Technological Admin UI
-- **Lucide Icons**
-
-### DevOps
-- Multi-stage **Dockerfile** + **`docker-compose.yml`**
-- **GitHub Actions CI** pipeline (`.github/workflows/ci.yml`)
-- Exportable **Postman Collection** (`postman_collection.json`)
-
----
-
-## 🚀 How to Run Locally
-
-### 1. Start Backend API (Terminal 1)
-```powershell
-npm run dev:backend
+```text
+FundsERP/
+│
+├── client/                 # React Frontend
+│   ├── src/
+│   ├── components/
+│   ├── pages/
+│   └── assets/
+│
+├── server/                 # Express Backend
+│   ├── routes/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── services/
+│   └── utils/
+│
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+│
+├── public/
+├── package.json
+└── README.md
 ```
-- **API URL**: `http://localhost:5000`
-- **Health Check**: `http://localhost:5000/health`
-
-### 2. Start Frontend UI (Terminal 2)
-```powershell
-npm run dev:frontend
-```
-- **Portal URL**: `http://localhost:5173`
 
 ---
 
-## 🐳 Docker Deployment
+# ⚙️ Getting Started
 
-```powershell
-docker-compose up --build -d
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/Saisradha/FundsERP.git
+
+cd FundsERP
 ```
+
+---
+
+## 2. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 3. Configure Environment Variables
+
+Create a `.env` file in the root directory.
+
+```env
+DATABASE_URL=your_postgresql_database_url
+
+PORT=5000
+
+JWT_SECRET=your_secret_key
+```
+
+---
+
+## 4. Setup Database
+
+```bash
+npx prisma migrate dev
+
+npx prisma generate
+```
+
+---
+
+## 5. Start Development Server
+
+```bash
+npm run dev
+```
+
+Application runs at:
+
+```
+Frontend:
+http://localhost:5173
+
+Backend:
+http://localhost:5000
+```
+
+---
+
+# 🎯 Core Modules
+
+* Dashboard
+* Inventory
+* Products
+* Customers
+* Suppliers
+* Purchase Orders
+* Sales
+* Delivery Challans
+* Reports
+* Authentication
+* Settings
+
+---
+
+# 📈 Future Roadmap
+
+* Barcode & QR Scanning
+* GST Billing
+* Multi-Warehouse Support
+* Purchase Forecasting
+* AI Inventory Prediction
+* Role-Based Access Control
+* Notification System
+* Mobile Responsive PWA
+* Export to Excel & PDF
+* Dark / Light Theme
+* Audit Logs
+* Email Notifications
+
+---
+
+# 📸 Screenshots
+
+> Add screenshots inside a `/screenshots` folder.
+
+Example:
+
+```
+screenshots/
+
+dashboard.png
+
+inventory.png
+
+customers.png
+
+billing.png
+
+analytics.png
+```
+
+Then include them like:
+
+```md
+## Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+## Inventory
+
+![Inventory](screenshots/inventory.png)
+```
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+
+```bash
+git checkout -b feature/new-feature
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Add new feature"
+```
+
+4. Push your branch
+
+```bash
+git push origin feature/new-feature
+```
+
+5. Open a Pull Request
+
+---
+
+# ⭐ Why FundsERP?
+
+FundsERP focuses on delivering a modern ERP experience with:
+
+* Fast performance
+* Responsive UI
+* Scalable architecture
+* Clean codebase
+* Enterprise-ready design
+* Modular backend
+* Real-world business workflows
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+**Sai Sradha**
+
+GitHub: https://github.com/Saisradha
+
+If you found this project helpful, consider giving it a ⭐ on GitHub.
