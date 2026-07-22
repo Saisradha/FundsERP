@@ -1,156 +1,89 @@
-# ERPFlow — Digital Warehouse OS
+# Mini ERP + CRM Operations Portal
 
-> A futuristic, industrial-grade **Digital Warehouse Operating System** combining Apple-inspired minimalism, Stripe-like precision, Linear-tier speed, and an interactive 3D Three.js engine.
-
----
-
-## ⚡ Key Highlights & Features
-
-- 🛡️ **Industrial Security Gate Login**: Laser scanner badge authentication experience with role-based clearance.
-- 🎛️ **Mission Control Telemetry**: Live KPI widgets tracking dispatch revenue, inventory levels, customer pipeline, and low-stock alerts.
-- 📦 **3D Digital Twin Warehouse**: Real-time interactive Three.js 3D warehouse floor with dynamic shelves, box stock density, low-stock emission glows, and patrolling 3D forklifts.
-- 🌌 **3D Customer CRM Galaxy**: Orbital 3D node graph displaying enterprise clients categorized by status (`Active` cyan, `Lead` orange, `Inactive` gray) with interaction note logs.
-- 🚛 **Sales Challan Dispatch Engine**: Drag-and-drop shipment creation with product snapshotting, animated truck loading, and **transactional negative stock protection**.
-- 🤖 **AURA Holographic AI Assistant**: Floating AI overlay for voice/text telemetry queries and instant navigation routing.
-- ⌨️ **Global Command Palette (`CTRL + K`)**: Instantaneous system-wide search.
+> A clean, technological, high-performance **Mini ERP + CRM Operations Portal** built for wholesale and distribution companies, satisfying 100% of the case study PDF requirements.
 
 ---
 
-## 🔐 Test Credentials (All 4 Required Roles)
+## 📋 Core Modules Implemented (100% PDF Spec Compliance)
 
-All accounts share the default passcode: **`password123`**
+### 1. 🔐 Authentication and Role-Based Access Control
+- JWT-based authentication supporting **4 required user roles**:
+  - `Admin`: Full system access across all modules
+  - `Sales`: Customer CRM management and sales challan creation
+  - `Warehouse`: Product inventory management, stock IN/OUT adjustments, and movement logs
+  - `Accounts`: Order status updates and financial audit review
 
-| Role | Email Address | Access Permissions |
-| :--- | :--- | :--- |
-| **Admin** | `admin@erpflow.com` | Full administrative system clearance across all modules & settings |
-| **Sales** | `sales@erpflow.com` | Customer CRM management, quotation follow-ups, and sales challans |
-| **Warehouse** | `warehouse@erpflow.com` | SKU catalog management, stock receiving (IN), dispatches (OUT), and audit logs |
-| **Accounts** | `accounts@erpflow.com` | Dispatch revenue review, customer credit terms, and status audit logs |
+#### Test Credentials (Passcode for all accounts: `password123`)
+| Role | Email |
+| :--- | :--- |
+| **Admin** | `admin@erpflow.com` |
+| **Sales** | `sales@erpflow.com` |
+| **Warehouse** | `warehouse@erpflow.com` |
+| **Accounts** | `accounts@erpflow.com` |
+
+---
+
+### 2. 👥 Customer CRM Module
+- **Fields**: Customer Name, Mobile Number, Email, Business Name, GST Number (Optional), Customer Type (`Retail`, `Wholesale`, `Distributor`), Address, Status (`Lead`, `Active`, `Inactive`), Follow-up Date, Notes.
+- **Features**: Add customer, Edit customer, Multi-field search, Filter by status, Customer detail view, and Follow-up notes timeline log.
+
+---
+
+### 3. 📦 Product & Inventory Module
+- **Fields**: Product Name, SKU/code, Category, Unit Price, Current Stock, Minimum Stock Alert Quantity, Location/Warehouse Shelf.
+- **Features**: Add product, Edit product, Low-stock warning indicators, Manual stock adjustments (IN receiving / OUT dispatch).
+- **Stock Movement Log**: Immutable audit ledger tracking Product, Quantity Changed, Movement Type (`IN` / `OUT`), Reason, Operator, and Timestamp.
+
+---
+
+### 4. 📄 Sales Challan Module
+- **Fields**: Challan Number (Auto-generated `CH-2026-XXXX`), Customer, Products List, Total Quantity, Total Amount, Status (`Draft`, `Confirmed`, `Cancelled`), Created By, Created Date.
+- **Features & Business Logic**:
+  - Select customer & add multiple products with quantity.
+  - **Item Snapshotting**: Saves historical product name, SKU, and unit price snapshot data at order creation.
+  - **Strict Negative Stock Protection**: Confirming a challan atomically checks stock. If stock is insufficient, the system rejects the transaction with a clear error message.
+  - State machine transitions (`Draft` → `Confirmed` → `Cancelled`).
 
 ---
 
 ## 🛠️ Required Tech Stack
 
-### Frontend
-- **Framework**: React 19 + TypeScript + Vite 6
-- **3D Engine**: React Three Fiber (`@react-three/fiber`), Drei (`@react-three/drei`), Three.js
-- **Animations**: Framer Motion
-- **Styling**: Industrial Dark Glassmorphism Design System (TailwindCSS v4)
-- **State Management**: Zustand
-- **Icons**: Lucide Icons
-
 ### Backend
-- **Runtime & Server**: Node.js + Express + TypeScript
-- **Database ORM**: Prisma ORM (Relational SQLite / Neon PostgreSQL)
-- **Authentication**: JSON Web Tokens (JWT Access + Refresh tokens)
-- **Validation**: Zod schema validation
-- **Architecture**: Service-Controller-Repository pattern with transactional guarantees
+- **Node.js** + **TypeScript** + **Express.js**
+- **Prisma ORM** (Relational schema with SQLite local / Neon PostgreSQL production)
+- **JWT** Authentication + **Bcrypt** Hashing + **Zod** Validation
 
-### DevOps & Deployment
-- **Containerization**: Multi-stage Dockerfiles + `docker-compose.yml`
-- **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`)
+### Frontend
+- **React 19** + **TypeScript** + **Vite 6**
+- **TailwindCSS** Clean Technological Admin UI
+- **Lucide Icons**
 
----
-
-## 📐 ER Diagram & System Architecture
-
-```
-+------------------+         +--------------------+         +--------------------+
-|       User       |         |      Customer      |         |    CustomerNote    |
-+------------------+         +--------------------+         +--------------------+
-| id (UUID) PK     |         | id (UUID) PK       |<------->| id (UUID) PK       |
-| name             |         | name               |         | customerId FK      |
-| email (Unique)   |         | businessName       |         | note               |
-| password (Bcrypt)|         | status (Enum)      |         | createdBy          |
-| role (Enum)      |         | customerType (Enum)|         | createdAt          |
-+------------------+         +--------------------+         +--------------------+
-                                      |
-                                      v
-+------------------+         +--------------------+         +--------------------+
-|    StockLog      |         |    SalesChallan    |         |    ChallanItem     |
-+------------------+         +--------------------+         +--------------------+
-| id (UUID) PK     |         | id (UUID) PK       |<------->| id (UUID) PK       |
-| productId FK     |<------- | challanNumber (UQ) |         | challanId FK       |
-| quantity         |         | customerId FK      |         | productId FK       |
-| type (IN/OUT)    |         | status (Enum)      |         | productName (Snap) |
-| reason           |         | totalAmount        |         | unitPrice (Snap)   |
-| createdBy        |         +--------------------+         | quantity           |
-+------------------+                                        +--------------------+
-```
+### DevOps
+- Multi-stage **Dockerfile** + **`docker-compose.yml`**
+- **GitHub Actions CI** pipeline (`.github/workflows/ci.yml`)
+- Exportable **Postman Collection** (`postman_collection.json`)
 
 ---
 
-## 🚀 Local Quickstart Guide
+## 🚀 How to Run Locally
 
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/user/erpflow.join
-cd erpflow
-
-# Install root dependencies
-npm install
-
-# Install backend dependencies
-cd backend && npm install && cd ..
-
-# Install frontend dependencies
-cd frontend && npm install --legacy-peer-deps && cd ..
+### 1. Start Backend API (Terminal 1)
+```powershell
+npm run dev:backend
 ```
+- **API URL**: `http://localhost:5000`
+- **Health Check**: `http://localhost:5000/health`
 
-### 2. Setup Database & Seed Test Data
-```bash
-cd backend
-npx prisma db push
-npx ts-node prisma/seed.ts
-cd ..
+### 2. Start Frontend UI (Terminal 2)
+```powershell
+npm run dev:frontend
 ```
-
-### 3. Run Development Servers Concurrently
-```bash
-npm run dev:backend   # Starts API server on http://localhost:5000
-npm run dev:frontend  # Starts 3D UI on http://localhost:5173
-```
+- **Portal URL**: `http://localhost:5173`
 
 ---
 
 ## 🐳 Docker Deployment
 
-To launch the complete production stack using Docker Compose:
-
-```bash
+```powershell
 docker-compose up --build -d
 ```
-- **Frontend App**: `http://localhost:5173`
-- **Backend API**: `http://localhost:5000`
-
----
-
-## 📡 REST API Reference
-
-| Method | Endpoint | Description | Role Clearance |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/login` | Authenticate badge credentials and return JWT tokens | Public |
-| `GET` | `/api/auth/me` | Fetch active user clearance profile | Authenticated |
-| `GET` | `/api/customers` | Query customer CRM list with search and status filters | Authenticated |
-| `POST` | `/api/customers` | Register new enterprise customer | Admin, Sales |
-| `POST` | `/api/customers/:id/notes` | Log follow-up interaction note | Admin, Sales, Accounts |
-| `GET` | `/api/products` | Retrieve warehouse products with low-stock alerts | Authenticated |
-| `POST` | `/api/products/:id/stock` | Perform manual stock receiving (IN) or audit reduction (OUT) | Admin, Warehouse |
-| `GET` | `/api/products/logs` | Fetch stock movement audit telemetry logs | Authenticated |
-| `POST` | `/api/challans` | Generate sales challan order with negative stock protection | Admin, Sales, Warehouse |
-| `PATCH` | `/api/challans/:id/status` | Update challan status (`DRAFT` → `CONFIRMED` → `CANCELLED`) | Admin, Sales, Warehouse, Accounts |
-
----
-
-## 📄 Postman Collection
-
-An exportable Postman collection is available at [`postman_collection.json`](./postman_collection.json). Import it directly into Postman for endpoint testing.
-
----
-
-## 🏆 Project Achievements & Satisfaction of Requirements
-
-- ✅ 100% compliance with all core assignment modules (Auth, CRM, Products, Inventory, Stock Logs, Sales Challan with snapshots, Negative Stock Protection).
-- ✅ Clean multi-layered Express architecture with strict TypeScript typing.
-- ✅ Industrial Dark Glassmorphism theme with high-end 3D React Three Fiber graphics.
-- ✅ Production-ready Docker containerization and GitHub Actions CI workflow.
