@@ -2,73 +2,95 @@
 
 @layer base {
   :root {
-    --bg-light: #F4F7FA;
-    --primary: #2563EB;
-    --accent: #F59E0B;
-    --success: #10B981;
-    --danger: #EF4444;
     --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
-
-  body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-light);
-    color: #1E293B;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
 }
 
-/* Light Glassmorphism Surfaces */
+/* Light Theme Variables */
+.theme-light {
+  --bg-app: #F4F7FA;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.12);
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-hover: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(255, 255, 255, 0.8);
+}
+
+/* Dark Theme Variables */
+.theme-dark {
+  --bg-app: #05070A;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --glass-bg: rgba(34, 42, 56, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  --card-bg: rgba(27, 33, 44, 0.6);
+  --card-hover: rgba(34, 42, 56, 0.8);
+  --card-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glass Panel & Cards Surface */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--glass-bg);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.12), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.65);
+  background: var(--card-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--card-border);
   border-radius: 1.25rem;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(37, 99, 235, 0.3);
-  box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.15);
+  background: var(--card-hover);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.2);
   transform: translateY(-2px);
 }
 
-/* Status Badges */
+/* Status Chips */
 .chip-primary {
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563EB;
-  border: 1px solid rgba(37, 99, 235, 0.25);
+  background: rgba(37, 99, 235, 0.15);
+  color: #3B82F6;
+  border: 1px solid rgba(37, 99, 235, 0.3);
 }
 
 .chip-success {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .chip-warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: #D97706;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .chip-danger {
-  background: rgba(239, 68, 68, 0.1);
-  color: #DC2626;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 /* Custom Scrollbars */
@@ -78,14 +100,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(244, 247, 250, 0.8);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(203, 213, 225, 0.8);
+  background: rgba(148, 163, 184, 0.4);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(37, 99, 235, 0.7);
+  background: rgba(59, 130, 246, 0.7);
 }
