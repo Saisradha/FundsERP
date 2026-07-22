@@ -6,9 +6,14 @@ import {
   History, 
   BarChart3, 
   LogOut, 
-  Building2
+  Building2,
+  Sun,
+  Moon,
+  Layers,
+  LayoutDashboard
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
+import { useThemeStore } from '../store/useThemeStore';
 
 interface IsometricNavDockProps {
   activeModule: 'dashboard' | 'inventory' | 'crm' | 'challans' | 'logs' | 'reports';
@@ -20,6 +25,7 @@ export const IsometricNavDock: React.FC<IsometricNavDockProps> = ({
   onSelectModule,
 }) => {
   const { user, logout } = useAuthStore();
+  const { theme, toggleTheme, viewMode, setViewMode } = useThemeStore();
 
   const buildings = [
     { id: 'inventory', label: 'Warehouse Racks', icon: Boxes },
@@ -40,49 +46,87 @@ export const IsometricNavDock: React.FC<IsometricNavDockProps> = ({
       case 'ACCOUNTS':
         return 'chip-success';
       default:
-        return 'bg-slate-200 text-slate-700';
+        return 'bg-slate-500/20 text-slate-400';
     }
   };
 
   return (
-    <header className="fixed top-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 glass-panel rounded-full flex items-center justify-between gap-8 shadow-xl">
+    <header className="fixed top-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 glass-panel rounded-full flex items-center justify-between gap-6 shadow-2xl">
+      
+      {/* Brand Header */}
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-blue-500/20">
           <Building2 className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="font-extrabold text-slate-900 text-base tracking-tight leading-none">ERPFLOW</h1>
-          <p className="text-[10px] text-slate-500 font-mono mt-0.5 uppercase">Miniature Industrial City OS</p>
+          <h1 className="font-extrabold text-sm tracking-tight leading-none">ERPFLOW</h1>
+          <p className="text-[10px] font-mono opacity-70 mt-0.5 uppercase">Operations Portal</p>
         </div>
       </div>
 
-      {/* Building Navigation Pills */}
-      <nav className="flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/80">
-        {buildings.map((b) => {
-          const Icon = b.icon;
-          const isActive = activeModule === b.id;
+      {/* View Mode Switcher (Hub vs 3D World) */}
+      <div className="flex items-center bg-slate-500/10 p-1 rounded-full border border-slate-500/20">
+        <button
+          onClick={() => setViewMode('hub')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            viewMode === 'hub' ? 'bg-blue-600 text-white shadow-sm' : 'opacity-70 hover:opacity-100'
+          }`}
+        >
+          <LayoutDashboard className="w-3.5 h-3.5" />
+          <span>Interactive Hub</span>
+        </button>
 
-          return (
-            <button
-              key={b.id}
-              onClick={() => onSelectModule(b.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
-              <span>{b.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+        <button
+          onClick={() => setViewMode('3d')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            viewMode === '3d' ? 'bg-blue-600 text-white shadow-sm' : 'opacity-70 hover:opacity-100'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>3D World View</span>
+        </button>
+      </div>
 
-      {/* User Clearance Badge */}
-      <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+      {/* 3D Building Navigation Pills (Visible in 3D Mode) */}
+      {viewMode === '3d' && (
+        <nav className="flex items-center gap-1.5 bg-slate-500/10 p-1.5 rounded-full border border-slate-500/20">
+          {buildings.map((b) => {
+            const Icon = b.icon;
+            const isActive = activeModule === b.id;
+
+            return (
+              <button
+                key={b.id}
+                onClick={() => onSelectModule(b.id)}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-sans font-semibold transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{b.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
+      {/* Controls: Dark / Light Mode Toggle & User Profile */}
+      <div className="flex items-center gap-3 pl-3 border-l border-slate-500/20">
+        
+        {/* Dark Mode / Light Mode Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full bg-slate-500/10 hover:bg-blue-600/20 border border-slate-500/20 transition-all cursor-pointer"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-600" />}
+        </button>
+
+        {/* Clearance User Profile */}
         <div className="text-right font-sans">
-          <div className="text-xs font-bold text-slate-900 leading-none">{user?.name}</div>
+          <div className="text-xs font-bold leading-none">{user?.name}</div>
           <div className={`mt-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full inline-block ${getRoleStyle(user?.role)}`}>
             {user?.role}
           </div>
@@ -90,12 +134,13 @@ export const IsometricNavDock: React.FC<IsometricNavDockProps> = ({
 
         <button
           onClick={logout}
-          className="p-2 rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-all cursor-pointer"
+          className="p-2 rounded-full bg-slate-500/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-500/20 transition-all cursor-pointer"
           title="Sign out"
         >
           <LogOut className="w-4 h-4" />
         </button>
       </div>
+
     </header>
   );
 };
