@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Lock, Mail, ArrowRight, Cpu, Eye, EyeOff, Check, ShieldCheck, Briefcase, Boxes, Receipt, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Mail, ArrowRight, Cpu, Eye, EyeOff, Check, ShieldCheck, Briefcase, Boxes, Receipt } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../components/ui/Toast';
@@ -102,6 +102,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState('');
 
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -121,12 +122,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      setAuth(res.data.user, res.data.accessToken);
-      toast.success(`Welcome back, ${res.data.user.name}`);
-      onSuccess();
+      
+      // Trigger full-page biometric laser scan beam
+      setIsScanning(true);
+
+      setTimeout(() => {
+        setAuth(res.data.user, res.data.accessToken);
+        toast.success(`Welcome back, ${res.data.user.name}`);
+        onSuccess();
+      }, 650);
     } catch (err: any) {
       setError(err.message || 'Invalid authorization credentials');
-    } finally {
       setLoading(false);
     }
   };
@@ -138,11 +144,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       {/* Cyber Particle Background Canvas */}
       <CyberParticleCanvas />
 
+      {/* Full-Page Biometric Laser Scanning Line */}
+      <AnimatePresence>
+        {isScanning && (
+          <motion.div
+            initial={{ top: '-5%' }}
+            animate={{ top: '105%' }}
+            transition={{ duration: 0.65, ease: 'easeInOut' }}
+            className="fixed left-0 right-0 z-50 pointer-events-none"
+            style={{
+              height: '3.5px',
+              background: 'linear-gradient(90deg, transparent, #06B6D4 20%, #38BDF8 50%, #8B5CF6 80%, transparent)',
+              boxShadow: '0 0 35px #06B6D4, 0 0 70px #8B5CF6',
+            }}
+          >
+            <div className="absolute inset-0 bg-cyan-400 opacity-90 blur-[2px]" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Multi-Spectrum Ambient Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[750px] rounded-full blur-[200px] pointer-events-none"
            style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(139, 92, 246, 0.12) 40%, transparent 75%)' }} />
 
-      {/* Animated Glowing Outer Border Container */}
+      {/* Animated Outer Gradient Glow Container */}
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -153,22 +178,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           boxShadow: '0 0 50px rgba(6, 182, 212, 0.25), 0 0 100px rgba(139, 92, 246, 0.15)',
         }}
       >
-        {/* Inner Glassmorphic Sci-Fi Card */}
+        {/* Inner Glassmorphic Card */}
         <div
           className="w-full rounded-[30.5px] p-7 sm:p-8 space-y-6 cyber-glass-panel"
           style={{ backgroundColor: 'rgba(6, 11, 20, 0.94)', backdropFilter: 'blur(30px)' }}
         >
-          {/* Header Status Bar */}
-          <div className="flex items-center justify-between text-[10px] font-mono border-b pb-3"
-               style={{ borderColor: 'var(--color-border)' }}>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-beacon" />
-              <span className="font-bold tracking-wider text-emerald-400">CYBER COMMAND ONLINE</span>
-            </div>
-            <span className="font-mono text-tertiary">v2.4 • 256-BIT ENCRYPTED</span>
-          </div>
-
-          {/* Holographic Quantum Core Header */}
+          {/* Holographic Core Header */}
           <div className="text-center space-y-2 pt-1">
             <div className="relative inline-flex items-center justify-center p-3.5 rounded-2xl border"
                  style={{
@@ -184,53 +199,44 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
             <h1 className="text-2xl font-bold tracking-tight font-mono uppercase text-white">
               ERPFLOW PORTAL
             </h1>
-            <p className="text-xs font-mono text-slate-400 flex items-center justify-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-cyan-400" /> Industrial Operations & Telemetry
-            </p>
           </div>
 
-          {/* Interactive Role Micro-Cards Grid */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-              <span>DEMO AUTHORIZATION KEYS</span>
-              <span className="text-cyan-400">PASS: password123</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {rolePresets.map((r) => {
-                const Icon = r.icon;
-                const isSelected = email === r.email;
-                return (
-                  <motion.button
-                    key={r.role}
-                    type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleRolePreset(r.email)}
-                    className="p-3 rounded-2xl border text-left cursor-pointer transition-all relative overflow-hidden"
-                    style={{
-                      backgroundColor: isSelected ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.4)',
-                      borderColor: isSelected ? r.color : 'rgba(255, 255, 255, 0.08)',
-                      boxShadow: isSelected ? `0 0 20px ${r.glow}` : 'none',
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="p-1.5 rounded-lg border flex items-center justify-center"
-                           style={{ backgroundColor: `${r.color}15`, borderColor: `${r.color}40`, color: r.color }}>
-                        <Icon className="w-3.5 h-3.5" />
-                      </div>
-                      {isSelected && (
-                        <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white"
-                              style={{ backgroundColor: r.color }}>
-                          <Check className="w-2.5 h-2.5" />
-                        </span>
-                      )}
+          {/* Interactive Role Micro-Cards */}
+          <div className="grid grid-cols-2 gap-2">
+            {rolePresets.map((r) => {
+              const Icon = r.icon;
+              const isSelected = email === r.email;
+              return (
+                <motion.button
+                  key={r.role}
+                  type="button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleRolePreset(r.email)}
+                  className="p-3 rounded-2xl border text-left cursor-pointer transition-all relative overflow-hidden"
+                  style={{
+                    backgroundColor: isSelected ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.4)',
+                    borderColor: isSelected ? r.color : 'rgba(255, 255, 255, 0.08)',
+                    boxShadow: isSelected ? `0 0 20px ${r.glow}` : 'none',
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="p-1.5 rounded-lg border flex items-center justify-center"
+                         style={{ backgroundColor: `${r.color}15`, borderColor: `${r.color}40`, color: r.color }}>
+                      <Icon className="w-3.5 h-3.5" />
                     </div>
-                    <div className="font-bold text-xs font-mono text-white">{r.role}</div>
-                    <div className="text-[9px] font-mono text-slate-400 truncate">{r.title}</div>
-                  </motion.button>
-                );
-              })}
-            </div>
+                    {isSelected && (
+                      <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white"
+                            style={{ backgroundColor: r.color }}>
+                        <Check className="w-2.5 h-2.5" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-bold text-xs font-mono text-white">{r.role}</div>
+                  <div className="text-[9px] font-mono text-slate-400 truncate">{r.title}</div>
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Sci-Fi Login Form */}
@@ -241,47 +247,41 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               </div>
             )}
 
-            <div className="space-y-1">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">OPERATIONAL IDENTIFIER</label>
-              <div className="relative">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="operator@erpflow.com"
-                  className="w-full px-3.5 py-2.5 pl-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
-                />
-                <Mail className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+            <div className="relative">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="operator@erpflow.com"
+                className="w-full px-3.5 py-2.5 pl-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+              />
+              <Mail className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">PASSCODE KEY</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 pl-10 pr-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
-                />
-                <Lock className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-3.5 py-2.5 pl-10 pr-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+              />
+              <Lock className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
 
             <motion.button
               type="submit"
-              disabled={loading}
+              disabled={loading || isScanning}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
               className="w-full py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider text-white cursor-pointer transition-all flex items-center justify-center gap-2 border border-cyan-400/40"
@@ -290,7 +290,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 boxShadow: '0 0 25px rgba(6, 182, 212, 0.4)',
               }}
             >
-              {loading ? (
+              {loading || isScanning ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
@@ -300,12 +300,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               )}
             </motion.button>
           </form>
-
-          {/* Security Status Footer */}
-          <div className="text-center text-[10px] font-mono text-slate-500 pt-1 flex items-center justify-between border-t border-slate-800">
-            <span>🛡️ END-TO-END ENCRYPTED</span>
-            <span>SYSTEM LATENCY: 12ms</span>
-          </div>
         </div>
       </motion.div>
     </div>
