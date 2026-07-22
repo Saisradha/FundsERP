@@ -1,0 +1,24 @@
+{
+  "name": "erpflow",
+  "version": "1.0.0",
+  "description": "ERPFlow - Digital Warehouse Operating System",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "seed": "npm run seed --prefix backend"
+  },
+  "keywords": [
+    "erp",
+    "crm",
+    "warehouse",
+    "threejs",
+    "react",
+    "express",
+    "prisma"
+  ],
+  "author": "ERPFlow Engineering",
+  "license": "MIT"
+}
