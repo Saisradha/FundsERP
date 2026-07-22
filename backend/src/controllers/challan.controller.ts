@@ -48,7 +48,7 @@ export class ChallanController {
 
   static async getChallanById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const challan = await ChallanService.getChallanById(id);
       return sendSuccess(res, 'Sales challan details retrieved', challan);
     } catch (err) {
@@ -58,7 +58,7 @@ export class ChallanController {
 
   static async updateChallanStatus(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const { status } = req.body;
       const updatedByName = req.user!.name;
 

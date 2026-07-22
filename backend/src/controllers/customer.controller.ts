@@ -29,7 +29,7 @@ export class CustomerController {
 
   static async getCustomerById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const customer = await CustomerService.getCustomerById(id);
       return sendSuccess(res, 'Customer details retrieved', customer);
     } catch (err) {
@@ -52,7 +52,7 @@ export class CustomerController {
 
   static async updateCustomer(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const customer = await CustomerService.updateCustomer(id, req.body);
       return sendSuccess(res, 'Customer updated successfully', customer);
     } catch (err) {
@@ -62,7 +62,7 @@ export class CustomerController {
 
   static async addNote(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const { note } = req.body;
       const createdBy = req.user?.name || 'System User';
 

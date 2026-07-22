@@ -29,7 +29,7 @@ export class ProductController {
 
   static async getProductById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const product = await ProductService.getProductById(id);
       return sendSuccess(res, 'Product details retrieved', product);
     } catch (err) {
@@ -52,7 +52,7 @@ export class ProductController {
 
   static async updateProduct(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const product = await ProductService.updateProduct(id, req.body);
       return sendSuccess(res, 'Product updated successfully', product);
     } catch (err) {
@@ -62,7 +62,7 @@ export class ProductController {
 
   static async adjustStock(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const { quantity, type, reason } = req.body;
       const createdBy = req.user?.name || 'System User';
 
