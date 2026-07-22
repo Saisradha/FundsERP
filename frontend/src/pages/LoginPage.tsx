@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Mail, ArrowRight, Cpu, Eye, EyeOff, Check } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Cpu, Eye, EyeOff, Check, ShieldCheck, Briefcase, Boxes, Receipt, Sparkles } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
 import { Button } from '../components/ui/Button';
@@ -12,13 +12,13 @@ interface LoginPageProps {
 }
 
 const rolePresets = [
-  { role: 'Admin', email: 'admin@erpflow.com' },
-  { role: 'Sales', email: 'sales@erpflow.com' },
-  { role: 'Warehouse', email: 'warehouse@erpflow.com' },
-  { role: 'Accounts', email: 'accounts@erpflow.com' },
+  { role: 'Admin', title: 'Root Operations', email: 'admin@erpflow.com', icon: ShieldCheck, color: '#06B6D4', glow: 'rgba(6, 182, 212, 0.4)' },
+  { role: 'Sales', title: 'CRM & Orders', email: 'sales@erpflow.com', icon: Briefcase, color: '#38BDF8', glow: 'rgba(56, 189, 248, 0.4)' },
+  { role: 'Warehouse', title: 'Inventory SKUs', email: 'warehouse@erpflow.com', icon: Boxes, color: '#F59E0B', glow: 'rgba(245, 158, 11, 0.4)' },
+  { role: 'Accounts', title: 'Audit Telemetry', email: 'accounts@erpflow.com', icon: Receipt, color: '#10B981', glow: 'rgba(16, 185, 129, 0.4)' },
 ];
 
-/* Particle Background Canvas (Unchanged) */
+/* Particle Background Canvas */
 const CyberParticleCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -40,15 +40,15 @@ const CyberParticleCanvas = () => {
     window.addEventListener('resize', handleResize);
 
     const particles: Array<{ x: number; y: number; vx: number; vy: number; radius: number }> = [];
-    const particleCount = Math.floor(Math.min(width, height) / 12);
+    const particleCount = Math.floor(Math.min(width, height) / 11);
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        radius: Math.random() * 1.5 + 1,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7,
+        radius: Math.random() * 1.8 + 1,
       });
     }
 
@@ -65,7 +65,7 @@ const CyberParticleCanvas = () => {
 
         ctx.beginPath();
         ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.5)';
         ctx.fill();
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -74,12 +74,12 @@ const CyberParticleCanvas = () => {
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 130) {
+          if (dist < 140) {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(6, 182, 212, ${0.25 * (1 - dist / 130)})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = `rgba(6, 182, 212, ${0.28 * (1 - dist / 140)})`;
+            ctx.lineWidth = 0.7;
             ctx.stroke();
           }
         }
@@ -96,7 +96,7 @@ const CyberParticleCanvas = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0 opacity-60" />;
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0 opacity-70" />;
 };
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
@@ -127,7 +127,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       toast.success(`Welcome back, ${res.data.user.name}`);
       onSuccess();
     } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+      setError(err.message || 'Invalid authorization credentials');
     } finally {
       setLoading(false);
     }
@@ -140,126 +140,174 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       {/* Cyber Particle Background Canvas */}
       <CyberParticleCanvas />
 
-      {/* Radial Ambient Center Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none"
-           style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.08) 50%, transparent 80%)' }} />
+      {/* Multi-Spectrum Ambient Background Lighting */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[750px] rounded-full blur-[200px] pointer-events-none"
+           style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(139, 92, 246, 0.12) 40%, transparent 75%)' }} />
 
+      {/* Animated Glowing Outer Border Container */}
       <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-sm sm:max-w-md rounded-3xl p-8 shadow-2xl space-y-6 relative z-10 border cyber-glass-panel"
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-md p-[1.5px] rounded-[32px] relative z-10 shadow-2xl"
         style={{
-          backgroundColor: 'var(--color-surface)',
-          borderColor: 'var(--color-border)',
-          boxShadow: 'var(--shadow-xl), 0 0 30px rgba(6, 182, 212, 0.1)',
+          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(139, 92, 246, 0.8) 50%, rgba(16, 185, 129, 0.8))',
+          boxShadow: '0 0 50px rgba(6, 182, 212, 0.25), 0 0 100px rgba(139, 92, 246, 0.15)',
         }}
       >
-        {/* Brand Core Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-2xl border"
-               style={{
-                 backgroundColor: 'var(--color-primary-light)',
-                 borderColor: 'var(--color-info-border)',
-                 color: 'var(--color-primary)',
-                 boxShadow: '0 0 15px var(--color-primary-glow)'
-               }}>
-            <Cpu className="w-7 h-7" />
+        {/* Inner Glassmorphic Card */}
+        <div
+          className="w-full rounded-[30.5px] p-7 sm:p-8 space-y-6 cyber-glass-panel"
+          style={{ backgroundColor: 'rgba(6, 11, 20, 0.94)', backdropFilter: 'blur(30px)' }}
+        >
+          {/* Header Status Bar */}
+          <div className="flex items-center justify-between text-[10px] font-mono border-b pb-3"
+               style={{ borderColor: 'var(--color-border)' }}>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-beacon" />
+              <span className="font-bold tracking-wider text-emerald-400">CYBER COMMAND ONLINE</span>
+            </div>
+            <span className="font-mono text-tertiary">12ms • 256-BIT ENCRYPTED</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight font-mono" style={{ color: 'var(--color-text)' }}>
-            ERPFlow
-          </h1>
-          <p className="text-xs font-mono" style={{ color: 'var(--color-text-secondary)' }}>
-            Enterprise Resource Planning & Operations
-          </p>
-        </div>
 
-        {/* Demo Preset Chips */}
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-mono font-bold uppercase tracking-wider block" style={{ color: 'var(--color-text-tertiary)' }}>
-            Quick Demo Login
-          </label>
-          <div className="grid grid-cols-2 gap-1.5">
-            {rolePresets.map((r) => {
-              const isSelected = email === r.email;
-              return (
+          {/* Brand Core Header */}
+          <div className="text-center space-y-2 pt-1">
+            <div className="relative inline-flex items-center justify-center p-3.5 rounded-2xl border"
+                 style={{
+                   backgroundColor: 'rgba(6, 182, 212, 0.12)',
+                   borderColor: 'rgba(6, 182, 212, 0.4)',
+                   color: '#06B6D4',
+                   boxShadow: '0 0 25px rgba(6, 182, 212, 0.3)'
+                 }}>
+              <Cpu className="w-8 h-8 relative z-10" />
+              {/* Spinning Orbit Ring */}
+              <div className="absolute inset-[-4px] border border-dashed border-cyan-400/60 rounded-2xl animate-spin-slow pointer-events-none" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight font-mono uppercase text-white">
+              ERPFLOW PORTAL
+            </h1>
+            <p className="text-xs font-mono text-slate-400 flex items-center justify-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-cyan-400" /> Enterprise Operations & Telemetry
+            </p>
+          </div>
+
+          {/* Interactive Role Micro-Cards Grid */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+              <span>ONE-CLICK DEMO ACCESS</span>
+              <span className="text-cyan-400">PASS: password123</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {rolePresets.map((r) => {
+                const Icon = r.icon;
+                const isSelected = email === r.email;
+                return (
+                  <motion.button
+                    key={r.role}
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleRolePreset(r.email)}
+                    className="p-3 rounded-2xl border text-left cursor-pointer transition-all relative overflow-hidden"
+                    style={{
+                      backgroundColor: isSelected ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.4)',
+                      borderColor: isSelected ? r.color : 'rgba(255, 255, 255, 0.08)',
+                      boxShadow: isSelected ? `0 0 20px ${r.glow}` : 'none',
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="p-1.5 rounded-lg border flex items-center justify-center"
+                           style={{ backgroundColor: `${r.color}15`, borderColor: `${r.color}40`, color: r.color }}>
+                        <Icon className="w-3.5 h-3.5" />
+                      </div>
+                      {isSelected && (
+                        <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white"
+                              style={{ backgroundColor: r.color }}>
+                          <Check className="w-2.5 h-2.5" />
+                        </span>
+                      )}
+                    </div>
+                    <div className="font-bold text-xs font-mono text-white">{r.role}</div>
+                    <div className="text-[9px] font-mono text-slate-400 truncate">{r.title}</div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 rounded-xl border text-xs font-mono font-medium bg-rose-950/60 border-rose-500/50 text-rose-300">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">OPERATIONAL IDENTIFIER</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="operator@erpflow.com"
+                  className="w-full px-3.5 py-2.5 pl-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                />
+                <Mail className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">PASSCODE KEY</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-3.5 py-2.5 pl-10 pr-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                />
+                <Lock className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <button
-                  key={r.role}
                   type="button"
-                  onClick={() => handleRolePreset(r.email)}
-                  className="px-3 py-1.5 rounded-xl border text-xs font-mono font-medium flex items-center justify-between cursor-pointer transition-all"
-                  style={{
-                    backgroundColor: isSelected ? 'var(--color-primary-light)' : 'var(--color-input)',
-                    borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
-                    color: isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                  }}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer transition-colors"
+                  tabIndex={-1}
                 >
-                  <span>{r.role}</span>
-                  {isSelected && <Check className="w-3 h-3" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-3 rounded-xl border text-xs font-mono font-medium" style={{
-              backgroundColor: 'var(--color-danger-light)',
-              borderColor: 'var(--color-danger-border)',
-              color: 'var(--color-danger-text)',
-            }}>
-              {error}
+              </div>
             </div>
-          )}
 
-          <Input
-            label="EMAIL ADDRESS"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            icon={<Mail className="w-4 h-4" />}
-            placeholder="operator@erpflow.com"
-          />
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="w-full py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider text-white cursor-pointer transition-all flex items-center justify-center gap-2 border border-cyan-400/40"
+              style={{
+                background: 'linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #8B5CF6 100%)',
+                boxShadow: '0 0 25px rgba(6, 182, 212, 0.4)',
+              }}
+            >
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>AUTHENTICATE SESSION</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </motion.button>
+          </form>
 
-          <div className="space-y-1">
-            <label className="input-label">PASSWORD</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="input-field pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer transition-colors"
-                style={{ color: 'var(--color-text-tertiary)' }}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+          {/* Footer Security Badge */}
+          <div className="text-center text-[10px] font-mono text-slate-500 pt-1 flex items-center justify-between border-t border-slate-800">
+            <span>🛡️ END-TO-END ENCRYPTED</span>
+            <span>SYSTEM LATENCY: 12ms</span>
           </div>
-
-          <Button
-            type="submit"
-            loading={loading}
-            className="w-full justify-center py-2.5"
-            icon={<ArrowRight className="w-4 h-4" />}
-          >
-            Sign In
-          </Button>
-        </form>
-
-        {/* Footer */}
-        <div className="text-center text-[11px] font-mono" style={{ color: 'var(--color-text-tertiary)' }}>
-          Default Password: <span className="font-semibold" style={{ color: 'var(--color-text-secondary)' }}>password123</span>
         </div>
       </motion.div>
     </div>
