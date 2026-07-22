@@ -36,3 +36,5 @@ backend/prisma/*.db-journal
 # Temporary / Scratch
 scratch/
 tmp/
+
+#logs - not required

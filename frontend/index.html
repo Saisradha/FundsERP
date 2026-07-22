@@ -1,39 +1,52 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="ERPFlow — Premium industrial warehouse ERP with 3D isometric visualization, inventory management, customer CRM, sales challans, and real-time stock tracking." />
-    <meta name="theme-color" content="#05070A" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#F5F7FA" media="(prefers-color-scheme: light)" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <title>ERPFlow — Operations Portal</title>
 
-    <!-- Google Fonts: Inter + JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="ERPFlow — Premium industrial warehouse ERP with 3D isometric visualization, inventory management, customer CRM, sales challans, and real-time stock tracking." />
+  <meta name="theme-color" content="#05070A" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F5F7FA" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <title>ERPFlow — Operations Portal</title>
+  <!-- logs - not required-->
+  <!-- Google Fonts: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
-    <!-- Theme initialization (prevents flash of wrong theme) -->
-    <script>
-      (function() {
-        var saved = localStorage.getItem('erpflow-theme') || 'dark';
-        var resolved = saved;
-        if (saved === 'system') {
-          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.classList.add('theme-' + resolved);
-      })();
-    </script>
+  <!-- Theme initialization (prevents flash of wrong theme) -->
+  <script>
+    (function () {
+      var saved = localStorage.getItem('erpflow-theme') || 'dark';
+      var resolved = saved;
+      if (saved === 'system') {
+        resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.classList.add('theme-' + resolved);
+    })();
+  </script>
 
-    <style>
-      /* Critical: prevent FOUC with a matching background */
-      html.theme-dark { background: #05070A; color: #F8FAFC; }
-      html.theme-light { background: #F5F7FA; color: #111827; }
-    </style>
-  </head>
-  <body class="antialiased overflow-x-hidden">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <style>
+    /* Critical: prevent FOUC with a matching background */
+    html.theme-dark {
+      background: #05070A;
+      color: #F8FAFC;
+    }
+
+    html.theme-light {
+      background: #F5F7FA;
+      color: #111827;
+    }
+  </style>
+</head>
+
+<body class="antialiased overflow-x-hidden">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
