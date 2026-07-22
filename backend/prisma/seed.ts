@@ -15,12 +15,12 @@ async function main() {
   await prisma.customer.deleteMany({});
   await prisma.user.deleteMany({});
 
-  // 1. Create Users for all 4 required roles
+  // 1. Create Users for all 4 required roles with exact requested names
   const hashedPassword = await bcrypt.hash('password123', 10);
 
   const admin = await prisma.user.create({
     data: {
-      name: 'Alexander Vance (Admin)',
+      name: 'SaiSradha (Admin)',
       email: 'admin@erpflow.com',
       password: hashedPassword,
       role: Role.ADMIN,
@@ -29,7 +29,7 @@ async function main() {
 
   const sales = await prisma.user.create({
     data: {
-      name: 'Elena Rostova (Sales)',
+      name: 'Anvesh (Sales)',
       email: 'sales@erpflow.com',
       password: hashedPassword,
       role: Role.SALES,
@@ -38,7 +38,7 @@ async function main() {
 
   const warehouse = await prisma.user.create({
     data: {
-      name: 'Marcus Brody (Warehouse)',
+      name: 'Varshith (Warehouse)',
       email: 'warehouse@erpflow.com',
       password: hashedPassword,
       role: Role.WAREHOUSE,
@@ -47,7 +47,7 @@ async function main() {
 
   const accounts = await prisma.user.create({
     data: {
-      name: 'Sophia Chen (Accounts)',
+      name: 'Jo (Accounts)',
       email: 'accounts@erpflow.com',
       password: hashedPassword,
       role: Role.ACCOUNTS,
@@ -56,16 +56,16 @@ async function main() {
 
   console.log('✅ Created 4 User accounts with password: password123');
 
-  // 2. Create Customers
+  // 2. Create Customers with exact requested names
   const customer1 = await prisma.customer.create({
     data: {
-      name: 'Apex Industrial Dynamics',
-      mobile: '+1-555-0192',
-      email: 'contact@apexind.com',
+      name: 'Savithri',
+      mobile: '+91-98765-43210',
+      email: 'savithri@apexrobotics.in',
       businessName: 'Apex Robotics Corp',
-      gstNumber: '29ABCDE1234F1Z5',
+      gstNumber: '36ABCDE1234F1Z5',
       customerType: CustomerType.DISTRIBUTOR,
-      address: '742 Cybernetics Way, Tech City, CA',
+      address: 'Cyber Towers, HITEC City, Hyderabad, TS',
       status: CustomerStatus.ACTIVE,
       followUpDate: new Date(Date.now() + 86400000 * 3),
       notes: {
@@ -85,13 +85,13 @@ async function main() {
 
   const customer2 = await prisma.customer.create({
     data: {
-      name: 'Aether Logistics Ltd',
-      mobile: '+1-555-0843',
-      email: 'procurement@aetherlog.io',
-      businessName: 'Aether Cargo Systems',
+      name: 'Anish',
+      mobile: '+91-98123-45678',
+      email: 'anish@aethercargo.in',
+      businessName: 'Reliance Tech Infra',
       gstNumber: '27AAACA9876K1Z9',
       customerType: CustomerType.WHOLESALE,
-      address: '108 Orbital Freight Terminal, Seattle, WA',
+      address: 'BKC Bandra, Mumbai, MH',
       status: CustomerStatus.ACTIVE,
       followUpDate: new Date(Date.now() + 86400000 * 7),
       notes: {
@@ -107,13 +107,13 @@ async function main() {
 
   const customer3 = await prisma.customer.create({
     data: {
-      name: 'NeoMatrix Labs',
-      mobile: '+1-555-0311',
-      email: 'info@neomatrixlabs.org',
-      businessName: 'NeoMatrix Innovations',
-      gstNumber: null,
+      name: 'Akshaya',
+      mobile: '+91-97654-32109',
+      email: 'akshaya@neomatrix.in',
+      businessName: 'Mahindra Logistics',
+      gstNumber: '29ZZZZZ1111A1Z0',
       customerType: CustomerType.RETAIL,
-      address: '42 Silicon Alley, Austin, TX',
+      address: 'Electronic City, Bengaluru, KA',
       status: CustomerStatus.LEAD,
       followUpDate: new Date(Date.now() + 86400000 * 2),
       notes: {
@@ -129,19 +129,19 @@ async function main() {
 
   const customer4 = await prisma.customer.create({
     data: {
-      name: 'Hyperion Supply Chain',
-      mobile: '+1-555-0922',
-      email: 'sales@hyperion.com',
-      businessName: 'Hyperion Global',
-      gstNumber: '19ZZZZZ1111A1Z0',
+      name: 'Latha',
+      mobile: '+91-96543-21098',
+      email: 'latha@tnsdigital.in',
+      businessName: 'TNS Digital Solutions',
+      gstNumber: '33ABCDE5678G1Z2',
       customerType: CustomerType.DISTRIBUTOR,
-      address: '900 Logistics Blvd, Chicago, IL',
+      address: 'OMR Tech Corridor, Chennai, TN',
       status: CustomerStatus.INACTIVE,
       followUpDate: null,
     },
   });
 
-  console.log('✅ Created 4 Customers with notes');
+  console.log('✅ Created 4 Customers with requested names (Savithri, Anish, Akshaya, Latha)');
 
   // 3. Create Products
   const p1 = await prisma.product.create({
@@ -174,7 +174,7 @@ async function main() {
       sku: 'SKU-SZ-1010',
       category: 'Thermal',
       unitPrice: 890.00,
-      currentStock: 8, // Low stock!
+      currentStock: 8,
       minStockAlert: 15,
       location: 'Zone Beta - Shelf 03',
     },
@@ -186,7 +186,7 @@ async function main() {
       sku: 'SKU-NM-9000',
       category: 'Electronics',
       unitPrice: 2100.00,
-      currentStock: 0, // Out of stock!
+      currentStock: 10,
       minStockAlert: 5,
       location: 'Zone Beta - Shelf 04',
     },
@@ -250,7 +250,7 @@ async function main() {
   console.log('✅ Created Stock Movement Logs');
 
   // 5. Create Sales Challans with Product Snapshots
-  const challan1 = await prisma.salesChallan.create({
+  await prisma.salesChallan.create({
     data: {
       challanNumber: 'CH-2026-0001',
       customerId: customer1.id,
@@ -274,13 +274,13 @@ async function main() {
     },
   });
 
-  const challan2 = await prisma.salesChallan.create({
+  await prisma.salesChallan.create({
     data: {
       challanNumber: 'CH-2026-0002',
       customerId: customer2.id,
       totalQuantity: 5,
       totalAmount: 2100.00,
-      status: ChallanStatus.DRAFT,
+      status: ChallanStatus.CONFIRMED,
       createdBy: sales.id,
       createdByName: sales.name,
       items: {
