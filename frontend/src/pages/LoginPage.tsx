@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Mail, ArrowRight, Cpu, Eye, EyeOff, Check, Sparkles } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Cpu, Eye, EyeOff, Check, ShieldCheck, Briefcase, Boxes, Receipt, Sparkles } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../components/ui/Toast';
@@ -10,10 +10,10 @@ interface LoginPageProps {
 }
 
 const rolePresets = [
-  { role: 'Admin', email: 'admin@erpflow.com' },
-  { role: 'Sales', email: 'sales@erpflow.com' },
-  { role: 'Warehouse', email: 'warehouse@erpflow.com' },
-  { role: 'Accounts', email: 'accounts@erpflow.com' },
+  { role: 'Admin', title: 'Root Operations', email: 'admin@erpflow.com', icon: ShieldCheck, color: '#06B6D4', glow: 'rgba(6, 182, 212, 0.4)' },
+  { role: 'Sales', title: 'CRM & Orders', email: 'sales@erpflow.com', icon: Briefcase, color: '#38BDF8', glow: 'rgba(56, 189, 248, 0.4)' },
+  { role: 'Warehouse', title: 'Inventory SKUs', email: 'warehouse@erpflow.com', icon: Boxes, color: '#F59E0B', glow: 'rgba(245, 158, 11, 0.4)' },
+  { role: 'Accounts', title: 'Audit Telemetry', email: 'accounts@erpflow.com', icon: Receipt, color: '#10B981', glow: 'rgba(16, 185, 129, 0.4)' },
 ];
 
 /* Particle Background Canvas (Preserved 100%) */
@@ -38,15 +38,15 @@ const CyberParticleCanvas = () => {
     window.addEventListener('resize', handleResize);
 
     const particles: Array<{ x: number; y: number; vx: number; vy: number; radius: number }> = [];
-    const particleCount = Math.floor(Math.min(width, height) / 12);
+    const particleCount = Math.floor(Math.min(width, height) / 11);
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        radius: Math.random() * 1.5 + 1,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7,
+        radius: Math.random() * 1.8 + 1,
       });
     }
 
@@ -63,7 +63,7 @@ const CyberParticleCanvas = () => {
 
         ctx.beginPath();
         ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.5)';
         ctx.fill();
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -72,12 +72,12 @@ const CyberParticleCanvas = () => {
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 130) {
+          if (dist < 140) {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(6, 182, 212, ${0.25 * (1 - dist / 130)})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = `rgba(6, 182, 212, ${0.28 * (1 - dist / 140)})`;
+            ctx.lineWidth = 0.7;
             ctx.stroke();
           }
         }
@@ -94,7 +94,7 @@ const CyberParticleCanvas = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0 opacity-60" />;
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0 opacity-75" />;
 };
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
@@ -125,159 +125,187 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       toast.success(`Welcome back, ${res.data.user.name}`);
       onSuccess();
     } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+      setError(err.message || 'Invalid authorization credentials');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-cyber-grid"
+    <div className="min-h-screen w-full flex items-center justify-center p-6 relative overflow-hidden bg-cyber-grid"
          style={{ backgroundColor: 'var(--color-bg)' }}>
 
       {/* Cyber Particle Background Canvas */}
       <CyberParticleCanvas />
 
-      {/* Radial Background Ambient Lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[180px] pointer-events-none"
-           style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(139, 92, 246, 0.12) 50%, transparent 80%)' }} />
+      {/* Multi-Spectrum Ambient Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[750px] rounded-full blur-[200px] pointer-events-none"
+           style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(139, 92, 246, 0.12) 40%, transparent 75%)' }} />
 
-      {/* Main Card Container */}
+      {/* Animated Glowing Outer Border Container */}
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-sm sm:max-w-md rounded-[32px] p-6 sm:p-7 shadow-2xl relative z-10 border cyber-glass-panel flex flex-col space-y-5"
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-md p-[1.5px] rounded-[32px] relative z-10 shadow-2xl"
         style={{
-          backgroundColor: 'rgba(6, 11, 20, 0.94)',
-          borderColor: 'rgba(139, 92, 246, 0.35)',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(6, 182, 212, 0.2)',
+          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(139, 92, 246, 0.8) 50%, rgba(16, 185, 129, 0.8))',
+          boxShadow: '0 0 50px rgba(6, 182, 212, 0.25), 0 0 100px rgba(139, 92, 246, 0.15)',
         }}
       >
-        {/* 3D Cyber Robot Mascot Holding/Peeking from the Right Side */}
-        <div className="absolute -right-20 sm:-right-28 top-1/2 -translate-y-1/2 w-44 sm:w-56 h-44 sm:h-56 z-30 pointer-events-none">
-          <img
-            src="/cyber_robot_right_peek.png"
-            alt="3D Robot holding login card"
-            className="w-full h-full object-contain filter drop-shadow-[0_12px_30px_rgba(6,182,212,0.6)]"
-            style={{ mixBlendMode: 'screen' }}
-          />
-        </div>
-
-        {/* Top Brand & Headline */}
-        <div className="text-center space-y-1">
-          <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-cyan-400 font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" /> ERPFLOW PORTAL
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-sans bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
-            Welcome Back
-          </h1>
-          <p className="text-xs font-mono text-slate-400">
-            Login to continue your operations
-          </p>
-        </div>
-
-        {/* Quick Role Selection Pills */}
-        <div className="space-y-1">
-          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 text-center">
-            Quick Role Login
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {rolePresets.map((r) => {
-              const isSelected = email === r.email;
-              return (
-                <button
-                  key={r.role}
-                  type="button"
-                  onClick={() => handleRolePreset(r.email)}
-                  className="px-3 py-1.5 rounded-full border text-xs font-mono font-medium flex items-center justify-between cursor-pointer transition-all"
-                  style={{
-                    backgroundColor: isSelected ? 'rgba(6, 182, 212, 0.18)' : 'rgba(15, 23, 42, 0.6)',
-                    borderColor: isSelected ? '#06B6D4' : 'rgba(255, 255, 255, 0.1)',
-                    color: isSelected ? '#06B6D4' : '#94A3B8',
-                    boxShadow: isSelected ? '0 0 12px rgba(6, 182, 212, 0.3)' : 'none',
-                  }}
-                >
-                  <span>{r.role}</span>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-cyan-400" />}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
-          {error && (
-            <div className="p-3 rounded-2xl border text-xs font-mono font-medium bg-rose-950/60 border-rose-500/50 text-rose-300">
-              {error}
+        {/* Inner Glassmorphic Sci-Fi Card */}
+        <div
+          className="w-full rounded-[30.5px] p-7 sm:p-8 space-y-6 cyber-glass-panel"
+          style={{ backgroundColor: 'rgba(6, 11, 20, 0.94)', backdropFilter: 'blur(30px)' }}
+        >
+          {/* Header Status Bar */}
+          <div className="flex items-center justify-between text-[10px] font-mono border-b pb-3"
+               style={{ borderColor: 'var(--color-border)' }}>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-beacon" />
+              <span className="font-bold tracking-wider text-emerald-400">CYBER COMMAND ONLINE</span>
             </div>
-          )}
-
-          {/* Email Input Field with Circular Badge */}
-          <div className="flex items-center gap-2.5 p-1.5 pl-2.5 rounded-full bg-slate-900/90 border border-slate-700/80 focus-within:border-cyan-400 focus-within:ring-1 focus-within:ring-cyan-400 transition-all">
-            <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center shrink-0">
-              <Mail className="w-4 h-4" />
-            </div>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email or Username"
-              className="w-full bg-transparent border-none text-white font-mono text-xs focus:outline-none placeholder:text-slate-500 pr-3"
-            />
+            <span className="font-mono text-tertiary">v2.4 • 256-BIT ENCRYPTED</span>
           </div>
 
-          {/* Password Input Field with Circular Badge */}
-          <div className="flex items-center gap-2.5 p-1.5 pl-2.5 pr-3 rounded-full bg-slate-900/90 border border-slate-700/80 focus-within:border-purple-400 focus-within:ring-1 focus-within:ring-purple-400 transition-all">
-            <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">
-              <Lock className="w-4 h-4" />
+          {/* Holographic Quantum Core Header */}
+          <div className="text-center space-y-2 pt-1">
+            <div className="relative inline-flex items-center justify-center p-3.5 rounded-2xl border"
+                 style={{
+                   backgroundColor: 'rgba(6, 182, 212, 0.12)',
+                   borderColor: 'rgba(6, 182, 212, 0.4)',
+                   color: '#06B6D4',
+                   boxShadow: '0 0 25px rgba(6, 182, 212, 0.3)'
+                 }}>
+              <Cpu className="w-8 h-8 relative z-10" />
+              {/* Spinning Orbit Ring */}
+              <div className="absolute inset-[-4px] border border-dashed border-cyan-400/60 rounded-2xl animate-spin-slow pointer-events-none" />
             </div>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full bg-transparent border-none text-white font-mono text-xs focus:outline-none placeholder:text-slate-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-slate-400 hover:text-white cursor-pointer transition-colors"
-              tabIndex={-1}
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
+            <h1 className="text-2xl font-bold tracking-tight font-mono uppercase text-white">
+              ERPFLOW PORTAL
+            </h1>
+            <p className="text-xs font-mono text-slate-400 flex items-center justify-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-cyan-400" /> Industrial Operations & Telemetry
+            </p>
           </div>
 
-          {/* Full-Width Action Pill Button */}
-          <motion.button
-            type="submit"
-            disabled={loading}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            className="w-full py-3 rounded-full font-mono font-bold text-xs text-white cursor-pointer transition-all flex items-center justify-center gap-2 shadow-lg"
-            style={{
-              background: 'linear-gradient(135deg, #06B6D4 0%, #6366F1 50%, #8B5CF6 100%)',
-              boxShadow: '0 8px 25px rgba(6, 182, 212, 0.35)',
-            }}
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>Sign In</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
+          {/* Interactive Role Micro-Cards Grid */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+              <span>DEMO AUTHORIZATION KEYS</span>
+              <span className="text-cyan-400">PASS: password123</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {rolePresets.map((r) => {
+                const Icon = r.icon;
+                const isSelected = email === r.email;
+                return (
+                  <motion.button
+                    key={r.role}
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleRolePreset(r.email)}
+                    className="p-3 rounded-2xl border text-left cursor-pointer transition-all relative overflow-hidden"
+                    style={{
+                      backgroundColor: isSelected ? 'rgba(15, 23, 42, 0.9)' : 'rgba(15, 23, 42, 0.4)',
+                      borderColor: isSelected ? r.color : 'rgba(255, 255, 255, 0.08)',
+                      boxShadow: isSelected ? `0 0 20px ${r.glow}` : 'none',
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="p-1.5 rounded-lg border flex items-center justify-center"
+                           style={{ backgroundColor: `${r.color}15`, borderColor: `${r.color}40`, color: r.color }}>
+                        <Icon className="w-3.5 h-3.5" />
+                      </div>
+                      {isSelected && (
+                        <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white"
+                              style={{ backgroundColor: r.color }}>
+                          <Check className="w-2.5 h-2.5" />
+                        </span>
+                      )}
+                    </div>
+                    <div className="font-bold text-xs font-mono text-white">{r.role}</div>
+                    <div className="text-[9px] font-mono text-slate-400 truncate">{r.title}</div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sci-Fi Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 rounded-xl border text-xs font-mono font-medium bg-rose-950/60 border-rose-500/50 text-rose-300">
+                {error}
+              </div>
             )}
-          </motion.button>
-        </form>
 
-        {/* Card Footer */}
-        <div className="text-center text-[10px] font-mono text-slate-500 pt-1">
-          Default Password: <span className="font-semibold text-slate-300">password123</span>
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">OPERATIONAL IDENTIFIER</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="operator@erpflow.com"
+                  className="w-full px-3.5 py-2.5 pl-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                />
+                <Mail className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">PASSCODE KEY</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-3.5 py-2.5 pl-10 pr-10 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                />
+                <Lock className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="w-full py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider text-white cursor-pointer transition-all flex items-center justify-center gap-2 border border-cyan-400/40"
+              style={{
+                background: 'linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #8B5CF6 100%)',
+                boxShadow: '0 0 25px rgba(6, 182, 212, 0.4)',
+              }}
+            >
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>AUTHENTICATE SESSION</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </motion.button>
+          </form>
+
+          {/* Security Status Footer */}
+          <div className="text-center text-[10px] font-mono text-slate-500 pt-1 flex items-center justify-between border-t border-slate-800">
+            <span>🛡️ END-TO-END ENCRYPTED</span>
+            <span>SYSTEM LATENCY: 12ms</span>
+          </div>
         </div>
       </motion.div>
     </div>
